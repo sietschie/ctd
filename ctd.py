@@ -3,6 +3,19 @@ import curses, sys, traceback
 # global variables
 class gb:
 	scrn = None # will point to window object
+	mapping = {}
+	the_map = {}
+
+def draw_map():
+	for x in range(1,21):
+		for y in range(1,21):
+			if gb.the_map[x,y] == 0:
+				draw_at(x,y,' ', curses.COLOR_GREEN, curses.COLOR_GREEN)
+			else:
+				draw_at(x,y,' ', curses.COLOR_YELLOW, curses.COLOR_YELLOW)
+
+def draw_at(x,y,chr,fg,bg):
+	gb.scrn.addch(x,y,chr,curses.color_pair(gb.mapping[fg,bg]))
 
 # this code is vital; without this code, your terminal would be unusable
 # after the program exits
@@ -22,11 +35,36 @@ def main():
 	# keystrokes are honored immediately, rather than waiting for the
 	# user to hit Enter
 	curses.cbreak()
+	# start color display (if it exists; could check with has_colors())
+	curses.start_color()
 	# clear screen
 	gb.scrn.clear()
+
+
+	list_of_colors = [ curses.COLOR_BLACK, curses.COLOR_BLUE, curses.COLOR_CYAN, curses.COLOR_GREEN, curses.COLOR_MAGENTA, curses.COLOR_RED, curses.COLOR_WHITE, curses.COLOR_YELLOW  ]
+
+	i = 1;
+	for bg in list_of_colors:
+		for fg in list_of_colors:
+			curses.init_pair(i,fg,bg)
+			gb.mapping[fg,bg] = i
+			i+=1
+
+	#init map
+	for x in range(1,21):
+		for y in range(1,21):
+			gb.the_map[x,y] = 0; #todo: durch konstante ersetzen
+
+	for x in range(1,15):
+			gb.the_map[x,5] = 1;
+
+	for y in range(5,21	):
+			gb.the_map[15,y] = 1;
+
 	# implement the actions done so far (just the clear())
 	gb.scrn.refresh()
 
+	draw_map()
 	# wait for key to be pressed
 	gb.scrn.getch()
 

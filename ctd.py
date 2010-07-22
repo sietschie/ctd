@@ -1,10 +1,66 @@
-import curses, sys, traceback
+import curses, sys, traceback, time
 
 # global variables
 class gb:
 	scrn = None # will point to window object
 	mapping = {}
 	the_map = {}
+	waypoints = {}
+	current_time = 0
+	last_time = 0
+	minions = []
+	max_x = 20
+	max_y = 20
+
+class minion:
+	x = 1
+	y = 5
+	dx = 0
+	dy = 0
+	speed = 1
+	current_wp = 1
+
+def draw_minions():
+	for m in gb.minions:
+		draw_at(int(m.x),int(m.y),'o', curses.COLOR_BLACK, curses.COLOR_YELLOW)
+
+def animate_minions():
+	delta = gb.current_time - gb.last_time
+	for m in gb.minions:
+		cw = gb.waypoints[m.current_wp]
+		diff_x = abs(m.x - cw[0])
+		diff_y = abs(m.y - cw[1])
+		if diff_x > diff_y:
+			dist_to_cw = diff_x
+		else:
+			dist_to_cw = diff_y
+
+		if dist_to_cw < delta*m.speed: # go to next wp
+			way_to_go = delta*m.speed - dist_to_cw
+			m.x = cw[0]
+			m.y = cw[1]
+			m.current_wp += 1
+			cw = gb.waypoints[m.current_wp]
+			diff_x = m.x - cw[0]
+			diff_y = m.y - cw[1]
+		else:
+			way_to_go = delta*m.speed
+		if diff_x > diff_y:
+			m.x += way_to_go
+			m.dx = way_to_go / delta
+			m.dy = 0
+		else:
+			m.y += way_to_go		
+			m.dx = 0
+			m.dy = way_to_go / delta
+		if int(m.x) < 1:
+			gb.minions.remove(m)
+		if int(m.x) > gb.max_x:
+			gb.minions.remove(m)
+		if int(m.y) < 1:
+			gb.minions.remove(m)
+		if int(m.y) > gb.max_y:
+			gb.minions.remove(m)
 
 def draw_map():
 	for x in range(1,21):
@@ -35,6 +91,8 @@ def main():
 	# keystrokes are honored immediately, rather than waiting for the
 	# user to hit Enter
 	curses.cbreak()
+
+	gb.scrn.nodelay(1)
 	# start color display (if it exists; could check with has_colors())
 	curses.start_color()
 	# clear screen
@@ -61,12 +119,32 @@ def main():
 	for y in range(5,21	):
 			gb.the_map[15,y] = 1;
 
+	gb.waypoints[0] = [0,5]
+	gb.waypoints[1] = [15,5]
+	gb.waypoints[2] = [15,22]
+
+	last_time = time.time()
+	current_time =  time.time()
+
 	# implement the actions done so far (just the clear())
 	gb.scrn.refresh()
 
-	draw_map()
-	# wait for key to be pressed
-	gb.scrn.getch()
+	while True:
+		# read character from keyboard
+		c = gb.scrn.getch()
+		# was returned as an integer (ASCII); make it a character
+		if c != -1:
+			i = c
+			c = chr(c)
+			# quit?
+			if c == 'q': break
+			if c == 'a':
+				gb.minions.append(minion())
+		gb.last_time = gb.current_time
+		gb.current_time = time.time()
+		animate_minions()
+		draw_map()
+		draw_minions()
 
 	# restore original settings
 	restorescreen()

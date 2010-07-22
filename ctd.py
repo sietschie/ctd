@@ -15,7 +15,7 @@ class gb:
 	current_time = 0
 	last_time = 0
 	minions = []
-	tower = tower()
+	towers = []
 	bullets = []
 	max_x = 20
 	max_y = 20
@@ -138,13 +138,17 @@ def find_target(ct):
 	else:
 		return 0
 
-def animate_tower():
-	if gb.current_time - gb.tower.last_shoot > gb.tower.speed: 
-		m = find_target(gb.tower)
+def animate_towers():
+	for t in gb.towers:
+		animate_tower(t)
+
+def animate_tower(ct):
+	if gb.current_time - ct.last_shoot > ct.speed: 
+		m = find_target(ct)
 
 		if m != 0:
-			shoot(gb.tower, m)	
-			gb.tower.last_shoot = gb.current_time
+			shoot(ct, m)	
+			ct.last_shoot = gb.current_time
 
 def animate_minions():
 	delta = gb.current_time - gb.last_time
@@ -183,8 +187,9 @@ def animate_minions():
 			gb.minions.remove(m)
 		if int(m.y) > gb.max_y:
 			gb.minions.remove(m)
-def draw_tower():
-	draw_at(int(gb.tower.x),int(gb.tower.y),'#', curses.COLOR_BLACK, curses.COLOR_GREEN)
+def draw_towers():
+	for t in gb.towers:
+		draw_at(int(t.x),int(t.y),'#', curses.COLOR_BLACK, curses.COLOR_GREEN)
 
 def draw_map():
 	for x in range(1,21):
@@ -216,9 +221,14 @@ def main():
 	# user to hit Enter
 	curses.cbreak()
 
+	gb.scrn.keypad(1)
+
 	gb.scrn.nodelay(1)
 	# start color display (if it exists; could check with has_colors())
 	curses.start_color()
+
+	curses.mousemask(curses.BUTTON1_PRESSED)
+
 	# clear screen
 	gb.scrn.clear()
 
@@ -258,21 +268,32 @@ def main():
 		c = gb.scrn.getch()
 		# was returned as an integer (ASCII); make it a character
 		if c != -1:
-			i = c
-			c = chr(c)
-			# quit?
-			if c == 'q': break
-			if c == 'a':
-				gb.minions.append(minion())
+			if c == curses.KEY_MOUSE:
+				id,y,x,z,button = curses.getmouse()
+				if x >= 1 :
+					if x <= gb.max_x : 
+						if y >= 1 :
+							if y <= gb.max_y:
+								if gb.the_map[x,y] == 0:
+									nt = tower()
+									nt.x = x
+									nt.y = y
+									gb.towers.append(nt)
+			else:
+				c = chr(c)
+				# quit?
+				if c == 'q': break
+				if c == 'a':
+					gb.minions.append(minion())
 		gb.last_time = gb.current_time
 		gb.current_time = time.time()
 		collision_detection()
 		animate_minions()
-		animate_tower()
+		animate_towers()
 		animate_bullets()
 		draw_map()
 		draw_minions()
-		draw_tower()
+		draw_towers()
 		draw_bullets()
 
 	# restore original settings

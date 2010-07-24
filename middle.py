@@ -49,15 +49,7 @@ def run():
 		if c != -1:
 			if c == system.KEY_MOUSE:
 				id,y,x,z,button = system.getmouse()
-				if x >= 1 :
-					if x <= logic.a_map.max_x : 
-						if y >= 1 :
-							if y <= logic.a_map.max_y:
-								if logic.a_map.tiles[x,y] == 0:
-									nt = logic.tower()
-									nt.x = x
-									nt.y = y
-									logic.towers.append(nt)
+				logic.add_tower(x,y)
 			else:
 				c = chr(c)
 				# quit?

@@ -142,6 +142,18 @@ class bullet(MovingObject):
 		if int(self.y) > a_map.max_y:
 			bullets.remove(self)
 
+def add_tower(x,y):
+	if x >= 1 :
+		if x <= a_map.max_x : 
+			if y >= 1 :
+				if y <= a_map.max_y:
+					if a_map.tiles[x,y] == 0:
+						nt = tower()
+						nt.x = x
+						nt.y = y
+						towers.append(nt)
+
+
 def collision_detection():
 	for b in bullets:
 		for m in minions:

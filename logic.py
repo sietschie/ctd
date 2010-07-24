@@ -3,6 +3,7 @@ import math
 minions = []
 bullets = []
 towers = []
+current_level = None
 
 class ScreenObject:
 	x = 0
@@ -85,13 +86,13 @@ class tower(ScreenObject):
 				self.next_shoot_in = self.speed
 
 class minion(MovingObject):
-	x = 1
-	y = 5
+	x = 5
+	y = 1
 	speed = 1
 	current_wp = 1
 
 	def animate(self, delta):
-		cw = a_map.waypoints[self.current_wp]
+		cw = current_level.waypoints[self.current_wp]
 		diff_x = abs(self.x - cw[0])
 		diff_y = abs(self.y - cw[1])
 		if diff_x > diff_y:
@@ -104,7 +105,7 @@ class minion(MovingObject):
 			self.x = cw[0]
 			self.y = cw[1]
 			self.current_wp += 1
-			cw = a_map.waypoints[self.current_wp]
+			cw = current_level.waypoints[self.current_wp]
 			diff_x = self.x - cw[0]
 			diff_y = self.y - cw[1]
 		else:
@@ -119,11 +120,11 @@ class minion(MovingObject):
 			self.dy = way_to_go / delta
 		if int(self.x) < 1:
 			minions.remove(self)
-		if int(self.x) > a_map.max_x:
+		if int(self.x) > current_level.max_x:
 			minions.remove(self)
 		if int(self.y) < 1:
 			minions.remove(self)
-		if int(self.y) > a_map.max_y:
+		if int(self.y) > current_level.max_y:
 			minions.remove(self)
 
 
@@ -135,19 +136,19 @@ class bullet(MovingObject):
 		self.y += delta * self.dy
 		if int(self.x) < 1:
 			bullets.remove(self)
-		if int(self.x) > a_map.max_x:
+		if int(self.x) > current_level.max_x:
 			bullets.remove(self)
 		if int(self.y) < 1:
 			bullets.remove(self)
-		if int(self.y) > a_map.max_y:
+		if int(self.y) > current_level.max_y:
 			bullets.remove(self)
 
 def add_tower(x,y):
 	if x >= 1 :
-		if x <= a_map.max_x : 
+		if x <= current_level.max_x : 
 			if y >= 1 :
-				if y <= a_map.max_y:
-					if a_map.tiles[x,y] == 0:
+				if y <= current_level.max_y:
+					if current_level.tiles[x,y] == 0:
 						for t in towers:
 							if t.x == x: 
 								if t.y == y:
@@ -179,27 +180,8 @@ def animate(delta):
 		b.animate(delta)
 
 
-class a_map:
+class level:
 	tiles = {}
 	max_x = 0
 	max_y = 0
 	waypoints = {}
-
-def init_map():
-	#init map
-	for x in range(1,21):
-		for y in range(1,21):
-			a_map.tiles[x,y] = 0; #todo: durch konstante ersetzen
-
-	for x in range(1,15):
-			a_map.tiles[x,5] = 1;
-
-	for y in range(5,21	):
-			a_map.tiles[15,y] = 1;
-
-	a_map.waypoints[0] = [0,5]
-	a_map.waypoints[1] = [15,5]
-	a_map.waypoints[2] = [15,22]
-
-	a_map.max_x = 20
-	a_map.max_y = 20

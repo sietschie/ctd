@@ -1,200 +1,37 @@
-import curses, sys, traceback, time, math
+import curses, sys, traceback, time, logic
 
-class tower:
-	x = 12
-	y = 8
-	last_shoot = 0
-	speed = 3
 
 # global variables
 class gb:
 	scrn = None # will point to window object
 	mapping = {}
-	the_map = {}
-	waypoints = {}
 	current_time = 0
 	last_time = 0
-	minions = []
-	towers = []
-	bullets = []
-	max_x = 20
-	max_y = 20
-
-class minion:
-	x = 1
-	y = 5
-	dx = 0
-	dy = 0
-	speed = 1
-	current_wp = 1
-
-class bullet:
-	x = 0
-	y = 0
-	dx = 0
-	dy = 0
-	speed = 1.5
-
+	delta = current_time - last_time
 
 
 def draw_minions():
-	for m in gb.minions:
+	for m in logic.minions:
 		draw_at(int(m.x),int(m.y),'o', curses.COLOR_BLACK, curses.COLOR_YELLOW)
 
 def draw_bullets():
-	for b in gb.bullets:
-		if gb.the_map[int(b.x),int(b.y)] == 0:
+	for b in logic.bullets:
+		if logic.a_map.tiles[int(b.x),int(b.y)] == 0:
 			draw_at(int(b.x),int(b.y),'*', curses.COLOR_BLACK, curses.COLOR_GREEN)
 		else:
 			draw_at(int(b.x),int(b.y),'*', curses.COLOR_BLACK, curses.COLOR_YELLOW)
 
-def animate_bullets():
-	delta = gb.current_time - gb.last_time
-	for b in gb.bullets:
-		b.x += delta * b.dx
-		b.y += delta * b.dy
-		if int(b.x) < 1:
-			gb.bullets.remove(b)
-		if int(b.x) > gb.max_x:
-			gb.bullets.remove(b)
-		if int(b.y) < 1:
-			gb.bullets.remove(b)
-		if int(b.y) > gb.max_y:
-			gb.bullets.remove(b)
 
-def collision_detection():
-	for b in gb.bullets:
-		for m in gb.minions:
-			if int(b.x) == int(m.x):
-				if int(b.y) == int(m.y):
-					gb.bullets.remove(b)
-					gb.minions.remove(m)
 
-def shoot(ct, cm):
-	t = vorhalt(ct,cm)
-	nb =  bullet()
-	nb.x = float(ct.x)
-	nb.y = float(ct.y)
 
-	diff_x = (cm.x + t * cm.dx) - nb.x
-	diff_y = (cm.y + t * cm.dy) - nb.y
-	
-	dist = math.sqrt( diff_x * diff_x + diff_y * diff_y )
-
-	nb.dx = nb.speed * float(diff_x) / float(dist)
-	nb.dy = nb.speed * float(diff_y) / float(dist)
-
-	gb.bullets.append(nb)
-
-def vorhalt(ct, cm):
-	a = cm.dx * cm.dx + cm.dy * cm.dy - bullet.speed * bullet.speed;
-	b = 2 * (cm.x - ct.x) * cm.dx + 2*(cm.y - ct.y) * cm.dy;
-	c = math.pow( cm.x - ct.x , 2) + math.pow( cm.y - ct.y, 2);
-
-	if a == 0: #vllt mit epsilon?
-		t = -c / b;
-		gb.scrn.addstr(20,20,str( t ))
-		gb.scrn.addstr(21,21,str( b ))
-		gb.scrn.addstr(22,22,str( c ))
-		gb.scrn.addstr(23,23,str( cm.dy ))
-		gb.scrn.addstr(24,24,str( ct.y ))
-		gb.scrn.addstr(25,25,str( cm.y ))
-		gb.scrn.addstr(26,26,str( cm.dx ))
-		gb.scrn.addstr(27,27,str( ct.x ))
-		gb.scrn.addstr(28,28,str( cm.x ))
-
-	else: # fuer speed ungleich 1, nicht getestet.
-		t1 = ( - b + math.sqrt( b * b - 4 * a * c))/(2*a);
-		t2 = ( - b - math.sqrt( b * b - 4 * a * c))/(2*a);
-
-		if t1 > 0:
-			if t2 > 0:
-				t = min(t1,t2)
-			else:
-				t = t1
-		else:
-			if t2 > 0:
-				t = t2
-			#else:
-				# irgendnen fehler?			
-	return t
-	
-	
-def find_target(ct):
-	min_dist = 100000
-	min_min = 0
-	for m in gb.minions:
-		diff_x = ct.x - m.x
-		diff_y = ct.y - m.y
-	
-		dist = math.sqrt( diff_x * diff_x + diff_y * diff_y )
-
-		if dist < min_dist:
-			min_dist = dist
-			min_min = m
-
-	if min_dist < 5:
-		return min_min
-	else:
-		return 0
-
-def animate_towers():
-	for t in gb.towers:
-		animate_tower(t)
-
-def animate_tower(ct):
-	if gb.current_time - ct.last_shoot > ct.speed: 
-		m = find_target(ct)
-
-		if m != 0:
-			shoot(ct, m)	
-			ct.last_shoot = gb.current_time
-
-def animate_minions():
-	delta = gb.current_time - gb.last_time
-	for m in gb.minions:
-		cw = gb.waypoints[m.current_wp]
-		diff_x = abs(m.x - cw[0])
-		diff_y = abs(m.y - cw[1])
-		if diff_x > diff_y:
-			dist_to_cw = diff_x
-		else:
-			dist_to_cw = diff_y
-
-		if dist_to_cw < delta*m.speed: # go to next wp
-			way_to_go = delta*m.speed - dist_to_cw
-			m.x = cw[0]
-			m.y = cw[1]
-			m.current_wp += 1
-			cw = gb.waypoints[m.current_wp]
-			diff_x = m.x - cw[0]
-			diff_y = m.y - cw[1]
-		else:
-			way_to_go = delta*m.speed
-		if diff_x > diff_y:
-			m.x += way_to_go
-			m.dx = way_to_go / delta
-			m.dy = 0
-		else:
-			m.y += way_to_go		
-			m.dx = 0
-			m.dy = way_to_go / delta
-		if int(m.x) < 1:
-			gb.minions.remove(m)
-		if int(m.x) > gb.max_x:
-			gb.minions.remove(m)
-		if int(m.y) < 1:
-			gb.minions.remove(m)
-		if int(m.y) > gb.max_y:
-			gb.minions.remove(m)
 def draw_towers():
-	for t in gb.towers:
+	for t in logic.towers:
 		draw_at(int(t.x),int(t.y),'#', curses.COLOR_BLACK, curses.COLOR_GREEN)
 
 def draw_map():
 	for x in range(1,21):
 		for y in range(1,21):
-			if gb.the_map[x,y] == 0:
+			if logic.a_map.tiles[x,y] == 0:
 				draw_at(x,y,' ', curses.COLOR_GREEN, curses.COLOR_GREEN)
 			else:
 				draw_at(x,y,' ', curses.COLOR_YELLOW, curses.COLOR_YELLOW)
@@ -242,20 +79,7 @@ def main():
 			gb.mapping[fg,bg] = i
 			i+=1
 
-	#init map
-	for x in range(1,21):
-		for y in range(1,21):
-			gb.the_map[x,y] = 0; #todo: durch konstante ersetzen
-
-	for x in range(1,15):
-			gb.the_map[x,5] = 1;
-
-	for y in range(5,21	):
-			gb.the_map[15,y] = 1;
-
-	gb.waypoints[0] = [0,5]
-	gb.waypoints[1] = [15,5]
-	gb.waypoints[2] = [15,22]
+	logic.init_map()
 
 	last_time = time.time()
 	current_time =  time.time()
@@ -271,26 +95,30 @@ def main():
 			if c == curses.KEY_MOUSE:
 				id,y,x,z,button = curses.getmouse()
 				if x >= 1 :
-					if x <= gb.max_x : 
+					if x <= logic.a_map.max_x : 
 						if y >= 1 :
-							if y <= gb.max_y:
-								if gb.the_map[x,y] == 0:
-									nt = tower()
+							if y <= logic.a_map.max_y:
+								if logic.a_map.tiles[x,y] == 0:
+									nt = logic.tower()
 									nt.x = x
 									nt.y = y
-									gb.towers.append(nt)
+									logic.towers.append(nt)
 			else:
 				c = chr(c)
 				# quit?
 				if c == 'q': break
 				if c == 'a':
-					gb.minions.append(minion())
+					logic.minions.append(logic.minion())
 		gb.last_time = gb.current_time
 		gb.current_time = time.time()
-		collision_detection()
-		animate_minions()
-		animate_towers()
-		animate_bullets()
+		gb.delta = gb.current_time - gb.last_time
+		logic.collision_detection()
+		for m in logic.minions:
+			m.animate(gb.delta)
+		for t in logic.towers:
+			t.animate(gb.delta)
+		for b in logic.bullets:
+			b.animate(gb.delta)
 		draw_map()
 		draw_minions()
 		draw_towers()

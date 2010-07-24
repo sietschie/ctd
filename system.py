@@ -11,7 +11,7 @@ getch = None
 getmouse = curses.getmouse
 
 def draw_at(x,y,chr,fg,bg):
-	scrn.addch(x,y,chr,curses.color_pair(mapping[fg,bg]))
+	scrn.addch(y,x,chr,curses.color_pair(mapping[fg,bg]))
 
 def init():
 	# first we must create a window object; it will fill the whole screen

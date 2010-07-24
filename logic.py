@@ -165,6 +165,16 @@ def collision_detection():
 					bullets.remove(b)
 					minions.remove(m)
 
+def animate(delta):
+	collision_detection()
+	for m in minions:
+		m.animate(delta)
+	for t in towers:
+		t.animate(delta)
+	for b in bullets:
+		b.animate(delta)
+
+
 class a_map:
 	tiles = {}
 	max_x = 0

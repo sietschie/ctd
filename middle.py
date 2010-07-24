@@ -59,13 +59,7 @@ def run():
 		gb.last_time = gb.current_time
 		gb.current_time = time.time()
 		gb.delta = gb.current_time - gb.last_time
-		logic.collision_detection()
-		for m in logic.minions:
-			m.animate(gb.delta)
-		for t in logic.towers:
-			t.animate(gb.delta)
-		for b in logic.bullets:
-			b.animate(gb.delta)
+		logic.animate(gb.delta)
 		draw_map()
 		draw_minions()
 		draw_towers()

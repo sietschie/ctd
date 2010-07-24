@@ -1,6 +1,8 @@
-import logic, system, time
+import logic, time
 from xml.dom import minidom
+from system import System
 
+system = System()
 restore = system.restorescreen
 
 # global variables
@@ -63,8 +65,6 @@ def load_map(file_name):
 	return nl
 
 def init():
-	system.init()
-
 	logic.current_level = load_map('map.xml')
 
 	last_time = time.time()

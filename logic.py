@@ -148,6 +148,10 @@ def add_tower(x,y):
 			if y >= 1 :
 				if y <= a_map.max_y:
 					if a_map.tiles[x,y] == 0:
+						for t in towers:
+							if t.x == x: 
+								if t.y == y:
+									return
 						nt = tower()
 						nt.x = x
 						nt.y = y

@@ -55,7 +55,7 @@ def run():
 				# quit?
 				if c == 'q': break
 				if c == 'a':
-					logic.minions.append(logic.minion())
+					logic.add_minion()
 		gb.last_time = gb.current_time
 		gb.current_time = time.time()
 		gb.delta = gb.current_time - gb.last_time

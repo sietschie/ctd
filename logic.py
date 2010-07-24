@@ -153,6 +153,9 @@ def add_tower(x,y):
 						nt.y = y
 						towers.append(nt)
 
+def add_minion():
+	minions.append(minion())
+
 
 def collision_detection():
 	for b in bullets:

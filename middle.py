@@ -1,3 +1,4 @@
+"""This Module glues together the logic and the system modules."""
 import time
 from xml.dom import minidom
 from system import System
@@ -6,6 +7,10 @@ from logic import Logic, Level
 
 # global variables
 class Middle:
+	"""It handles the input, keeps track of time and draws objects to
+	the screen.
+	"""
+
 	current_time = 0
 	last_time = 0
 	delta = current_time - last_time
@@ -16,11 +21,13 @@ class Middle:
 
 
 	def draw_minions(self):
+		"""Draws minions to screen."""
 		for minion in self.logic.minions:
 			self.system.draw_at(int(minion.x), int(minion.y), 'o', 
 				self.system.COLOR_BLACK, self.system.COLOR_YELLOW)
 
 	def draw_bullets(self):
+		"""Draws bullets to screen."""
 		for bullet in self.logic.bullets:
 			if self.logic.current_level.tiles[int(bullet.x), int(bullet.y)] == 0:
 				self.system.draw_at(int(bullet.x), int(bullet.y), '*', 
@@ -30,11 +37,13 @@ class Middle:
 					self.system.COLOR_BLACK, self.system.COLOR_YELLOW)
 
 	def draw_towers(self):
+		"""Draws towers to screen."""
 		for tower in self.logic.towers:
 			self.system.draw_at(int(tower.x), int(tower.y), '#', 
 				self.system.COLOR_BLACK, self.system.COLOR_GREEN)
 
 	def draw_map(self):
+		"""Draws map to screen."""
 		for x in range(1, 21):
 			for y in range(1, 21):
 				if self.logic.current_level.tiles[x, y] == 0:
@@ -45,6 +54,7 @@ class Middle:
 						self.system.COLOR_YELLOW, self.system.COLOR_YELLOW)
 
 	def load_map(self, file_name):
+		"""Loads map from xml file"""
 		map_xml = minidom.parse(file_name)
 
 		map_tag = map_xml.getElementsByTagName('map')[0]
@@ -82,6 +92,7 @@ class Middle:
 
 
 	def run(self):
+		"""The main game loop"""
 		while True:
 			# read character from keyboard
 			char = self.system.getch()

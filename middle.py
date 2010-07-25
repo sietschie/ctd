@@ -1,8 +1,10 @@
 import logic, time
 from xml.dom import minidom
 from system import System
+from logic import Logic, Level
 
 system = System()
+logic = Logic()
 restore = system.restorescreen
 
 # global variables
@@ -41,7 +43,7 @@ def load_map(file_name):
 	map_tag = map_xml.getElementsByTagName('map')
 
 
-	nl = logic.level()
+	nl = Level()
 	nl.max_y = int( map_tag[0].getElementsByTagName('rows')[0].firstChild.data )
 	nl.max_x = int( map_tag[0].getElementsByTagName('columns')[0].firstChild.data )
 

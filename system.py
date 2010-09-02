@@ -16,6 +16,9 @@ class System:
 	def draw_at(self, coord_x, coord_y, char, color_fg, color_bg):
 		self.scrn.addch(coord_y, coord_x, char, \
 			curses.color_pair(self.mapping[color_fg, color_bg]))
+			
+	def draw_string_at(self, coord_x, coord_y, str):
+		self.scrn.addstr(coord_y, coord_x, str)
 
 	def __init__(self):
 		# first we must create a window object; it will fill the whole screen

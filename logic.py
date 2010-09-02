@@ -171,13 +171,22 @@ class Logic:
 	bullets = []
 	towers = []
 	current_level = None
+	money = None
+	points = None
 
 	def __init__(self):
+		self.money = 10
+		self.points = 0
 		pass
 
 
 	def add_tower(self, x, y):
 		"""Checks for boundaries and adds tower on success."""
+		if self.money < 5:
+			return
+
+		self.money -= 5
+		
 		if x >= 1 :
 			if x <= self.current_level.max_x : 
 				if y >= 1 :
@@ -222,6 +231,8 @@ class Logic:
 					if int(bullet.y) == int(minion.y):
 						self.bullets.remove(bullet)
 						self.minions.remove(minion)
+						self.points += 1
+						self.money += 1
 						break
 
 	def animate(self, delta):

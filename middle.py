@@ -52,6 +52,10 @@ class Middle:
 				else:
 					self.system.draw_at(x, y, ' ', 
 						self.system.COLOR_YELLOW, self.system.COLOR_YELLOW)
+						
+	def draw_hud(self):
+		self.system.draw_string_at(25,5,format(self.logic.points, '03d'))
+		self.system.draw_string_at(25,6,format(self.logic.money, '03d'))
 
 	def load_map(self, file_name):
 		"""Loads map from xml file"""
@@ -116,6 +120,7 @@ class Middle:
 			self.draw_minions()
 			self.draw_towers()
 			self.draw_bullets()
+			self.draw_hud()
 
 		# restore original settings
 		self.system.restorescreen()

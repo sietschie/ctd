@@ -17,9 +17,14 @@ class Middle:
 
 	system = System()
 	logic = Logic()
-	restore = system.restorescreen
+	def restore(self):
+		System.restorescreen()
 
-
+	def update_time(self):
+		self.last_time = self.current_time
+		self.current_time = time.time()
+		self.delta = self.current_time - self.last_time
+			
 	def draw_minions(self):
 		"""Draws minions to screen."""
 		for minion in self.logic.minions:
@@ -112,9 +117,7 @@ class Middle:
 						break
 					if char == 'a':
 						self.logic.add_minion()
-			self.last_time = self.current_time
-			self.current_time = time.time()
-			self.delta = self.current_time - self.last_time
+			self.update_time()
 			self.logic.animate(self.delta)
 			self.draw_map()
 			self.draw_minions()

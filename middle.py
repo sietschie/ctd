@@ -2,7 +2,7 @@
 import time
 from xml.dom import minidom
 from system import System
-from logic import Logic, Level
+from logic import Logic, Level, Wave
 
 
 # global variables
@@ -59,8 +59,29 @@ class Middle:
 						self.system.COLOR_YELLOW, self.system.COLOR_YELLOW)
 						
 	def draw_hud(self):
-		self.system.draw_string_at(25,5,format(self.logic.points, '03d'))
-		self.system.draw_string_at(25,6,format(self.logic.money, '03d'))
+		self.system.draw_string_at(25,5,"lives:  %03d" % self.logic.lives )
+		self.system.draw_string_at(25,6,"points: %03d" % self.logic.points )
+		self.system.draw_string_at(25,7,"money:  %03d" % self.logic.money )
+		self.system.draw_string_at(25,8,"num minions:  %03d" % len(self.logic.minions) )
+
+		if self.logic.minions:
+			self.system.draw_string_at(25,9,"minion[0].x:  %f" % (self.logic.minions[0].x) )
+			self.system.draw_string_at(25,10,"minion[0].y:  %f" % (self.logic.minions[0].y) )
+
+		x = 1
+		for w in self.logic.current_level.active_waves:
+			self.system.draw_string_at(x,22,"a: %0.1f, %i" % (w.next_minion_in, w.nr_minion))
+			x += 15
+		
+		w = self.logic.current_level.next_wave
+		if w:
+			self.system.draw_string_at(x,22,"n: %0.1f, %0.1f, %i" % (w.offset_wave, w.next_minion_in, w.nr_minion))
+			x += 20
+
+		for w in self.logic.current_level.waves:
+			self.system.draw_string_at(x,22,"r: %0.1f, %i" % (w.next_minion_in, w.nr_minion))
+			x += 15
+
 
 	def load_map(self, file_name):
 		"""Loads map from xml file"""
@@ -90,6 +111,32 @@ class Middle:
 			y = int( waypoint.getElementsByTagName('y')[0].firstChild.data )
 
 			level.waypoints[number] = [x, y]
+			
+		#TODO: load waves from file
+		w = Wave()
+		w.offset_wave = 1
+		w.offset_minion = 50
+		w.hp_minion = 1
+		w.nr_minion = 4
+
+		level.next_wave = w
+
+		w = Wave()
+		w.offset_wave = 150
+		w.offset_minion = 1
+		w.hp_minion = 1
+		w.nr_minion = 5
+
+		level.waves.append(w)
+
+		w = Wave()
+		w.offset_wave = 150
+		w.offset_minion = 0.5
+		w.hp_minion = 1
+		w.nr_minion = 5
+
+		level.waves.append(w)
+		
 
 		self.logic.current_level = level
 
@@ -117,13 +164,17 @@ class Middle:
 						break
 					if char == 'a':
 						self.logic.add_minion()
+					if char == ' ':
+						self.logic.current_level.send_next_wave()
 			self.update_time()
 			self.logic.animate(self.delta)
+			self.system.scrn.erase()
 			self.draw_map()
 			self.draw_minions()
 			self.draw_towers()
 			self.draw_bullets()
 			self.draw_hud()
+			time.sleep(0.01)
 
 		# restore original settings
 		self.system.restorescreen()

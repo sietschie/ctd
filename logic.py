@@ -7,8 +7,46 @@ class Level:
 	max_x = 0
 	max_y = 0
 	waypoints = {}
+	waves = []
+	next_wave = None
+	active_waves = []
 	def __init__(self):
 		pass
+		
+	def send_next_wave(self):
+		if self.next_wave:
+			self.active_waves.append(self.next_wave)
+			if self.waves:
+				self.next_wave = self.waves[0]
+				self.waves.remove(self.next_wave)
+			else:
+				self.next_wave = None
+		
+	def update(self, delta):
+		if self.next_wave:
+			self.next_wave.offset_wave -= delta
+			if self.next_wave.offset_wave <= 0:
+				self.send_next_wave()
+			
+		for w in self.active_waves:
+			w.update(delta)
+
+class Wave:
+	new_minion = False
+	def __init__(self):
+		self.next_minion_in = 0
+		self.offset_wave = 0
+		self.offset_minion = 0
+		self.nr_minion = 0
+		self.hp_minion = 0
+		
+	def update(self, delta):
+		self.next_minion_in -= delta
+		if self.next_minion_in <= 0:
+			self.new_minion = True
+			self.next_minion_in = self.offset_minion
+			
+		
 
 class ScreenObject:
 	"""An Object that appears on screen"""
@@ -122,6 +160,7 @@ class Minion(MovingObject):
 
 	def animate(self, delta):
 		"""Computes new position."""
+		#TODO: negative dx erlauben
 		current_waypoint = self.waypoints[self.current_wp]
 		diff_x = abs(self.x - current_waypoint[0])
 		diff_y = abs(self.y - current_waypoint[1])
@@ -137,9 +176,10 @@ class Minion(MovingObject):
 			self.current_wp += 1
 			if self.current_wp < len(self.waypoints):
 				current_waypoint = self.waypoints[self.current_wp]
-				diff_x = self.x - current_waypoint[0]
-				diff_y = self.y - current_waypoint[1]
+				diff_x = abs(self.x - current_waypoint[0])
+				diff_y = abs(self.y - current_waypoint[1])
 			else:
+				end_reached = True
 				diff_x = 0
 				diff_y = 0
 				way_to_go = 0
@@ -147,12 +187,12 @@ class Minion(MovingObject):
 			way_to_go = delta*self.speed
 		if diff_x > diff_y:
 			self.x += way_to_go
-			self.dx = way_to_go / delta
+			self.dx = self.speed
 			self.dy = 0
 		else:
 			self.y += way_to_go		
 			self.dx = 0
-			self.dy = way_to_go / delta
+			self.dy = self.speed
 
 
 class Bullet(MovingObject):
@@ -173,11 +213,12 @@ class Logic:
 	current_level = None
 	money = None
 	points = None
+	lives = None
 
 	def __init__(self):
 		self.money = 10
 		self.points = 0
-		pass
+		self.lives = 5
 
 
 	def add_tower(self, x, y):
@@ -207,8 +248,9 @@ class Logic:
 
 	def check_for_finished_minions(self):
 		"""Check if minion reached end of pathway."""
-		for minion in self.minions:
+		for minion in self.minions[:]:
 			if minion.current_wp == len(minion.waypoints):
+				self.lives -= 1
 				self.minions.remove(minion)
 
 	def collision_detection(self):
@@ -237,8 +279,11 @@ class Logic:
 
 	def animate(self, delta):
 		"""Computes new state of the game."""
-		for minion in self.minions:
+		for minion in self.minions[:]:
 			minion.animate(delta)
+			#if minion.reached_end:
+				#self.minions.remove(minion)
+				#self.lives -= 1
 		for tower in self.towers:
 			tower.animate(delta)
 		for bullet in self.bullets:
@@ -249,6 +294,16 @@ class Logic:
 			bullet = tower.shoot(self.minions)
 			if bullet != None:
 				self.bullets.append(bullet)
+		
+		self.current_level.update(delta)
+		for w in self.current_level.active_waves[:]:
+			if w.new_minion:
+				w.new_minion = False
+				w.nr_minion -= 1
+				self.add_minion()
+				if w.nr_minion == 0:
+					self.current_level.active_waves.remove(w)
+				
 		
 
 

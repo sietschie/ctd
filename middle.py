@@ -17,7 +17,9 @@ class Middle:
 
     system = System()
     logic = Logic()
-    def restore(self):
+
+    @staticmethod
+    def restore():
         """things to before shutdown"""
         System.restorescreen()
 
@@ -99,10 +101,12 @@ class Middle:
 
         map_tag = map_xml.getElementsByTagName('map')[0]
 
+        def get_data(elem, tag):
+            return elem.getElementsByTagName(tag)[0].firstChild.data
 
         level = Level()
-        level.max_y = int(map_tag.getElementsByTagName('rows')[0].firstChild.data)
-        level.max_x = int(map_tag.getElementsByTagName('columns')[0].firstChild.data)
+        level.max_y = int(get_data(map_tag, 'rows'))
+        level.max_x = int(get_data(map_tag,'columns'))
 
         row_tag = map_xml.getElementsByTagName('row')
 
@@ -112,32 +116,19 @@ class Middle:
             for x in range(1, len(row_data)+1):
                 level.tiles[x, y] = int(row_data[x-1])
 
-        wps_tag = map_xml.getElementsByTagName('waypoints')
-        wp_tag = wps_tag[0].getElementsByTagName('waypoint')
-
-        for waypoint in wp_tag:    
+        for waypoint in map_xml.getElementsByTagName('waypoint'):    
             number = int( waypoint.attributes['nr'].value )
-            x = int( waypoint.getElementsByTagName('x')[0].firstChild.data )
-            y = int( waypoint.getElementsByTagName('y')[0].firstChild.data )
+            x = int( get_data(waypoint,'x'))
+            y = int( get_data(waypoint,'y'))
 
             level.waypoints[number] = [x, y]
 
-        wvs_tag = map_xml.getElementsByTagName('waves')
-        wv_tag = wvs_tag[0].getElementsByTagName('wave')
-
-        for wave in wv_tag:    
-            offset_wave = int( wave.getElementsByTagName('offset_wave')[0].firstChild.data )
-            offset_minion = int( wave.getElementsByTagName('offset_minion')[0].firstChild.data )
-            nr_minion = int( wave.getElementsByTagName('nr_minion')[0].firstChild.data )
-            hp_minion = int( wave.getElementsByTagName('hp_minion')[0].firstChild.data )
-
-            level.waypoints[number] = [x, y]
-
+        for wave in map_xml.getElementsByTagName('wave'):    
             w = Wave()
-            w.offset_wave = offset_wave
-            w.offset_minion = offset_minion
-            w.hp_minion = hp_minion
-            w.nr_minion = nr_minion
+            w.offset_wave = int( get_data(wave, 'offset_wave'))
+            w.offset_minion = int( get_data(wave, 'offset_minion'))
+            w.hp_minion = int( get_data(wave, 'hp_minion'))
+            w.nr_minion = int( get_data(wave, 'nr_minion'))
 
             level.waves.append(w)
             

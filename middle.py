@@ -18,9 +18,13 @@ class Middle:
     system = System()
     logic = Logic()
     def restore(self):
+        """things to before shutdown"""
         System.restorescreen()
 
     def update_time(self):
+        """computes difference between last and current time, 
+        result in delta
+        """
         self.last_time = self.current_time
         self.current_time = time.time()
         self.delta = self.current_time - self.last_time
@@ -59,27 +63,33 @@ class Middle:
                         self.system.COLOR_YELLOW, self.system.COLOR_YELLOW)
                         
     def draw_hud(self):
-        self.system.draw_string_at(25,5,"lives:  %03d" % self.logic.lives )
-        self.system.draw_string_at(25,6,"points: %03d" % self.logic.points )
-        self.system.draw_string_at(25,7,"money:  %03d" % self.logic.money )
-        self.system.draw_string_at(25,8,"num minions:  %03d" % len(self.logic.minions) )
+        """draws hud to screen"""
+        self.system.draw_string_at(25, 5, "lives:  %03d" % self.logic.lives )
+        self.system.draw_string_at(25, 6, "points: %03d" % self.logic.points )
+        self.system.draw_string_at(25, 7, "money:  %03d" % self.logic.money )
+        self.system.draw_string_at(25, 8, "num minions:  %03d" % len(self.logic.minions) )
 
         if self.logic.minions:
-            self.system.draw_string_at(25,9,"minion[0].x:  %f" % (self.logic.minions[0].x) )
-            self.system.draw_string_at(25,10,"minion[0].y:  %f" % (self.logic.minions[0].y) )
+            self.system.draw_string_at(25, 9, \
+                "minion[0].x:  %f" % (self.logic.minions[0].x) )
+            self.system.draw_string_at(25, 10, \
+                "minion[0].y:  %f" % (self.logic.minions[0].y) )
 
         x = 1
         for w in self.logic.current_level.active_waves:
-            self.system.draw_string_at(x,22,"a: %0.1f, %i" % (w.next_minion_in, w.nr_minion))
+            self.system.draw_string_at(x, 22, \
+                "a: %0.1f, %i" % (w.next_minion_in, w.nr_minion))
             x += 15
         
         w = self.logic.current_level.next_wave
         if w:
-            self.system.draw_string_at(x,22,"n: %0.1f, %0.1f, %i" % (w.offset_wave, w.next_minion_in, w.nr_minion))
+            self.system.draw_string_at(x, 22, \
+                "n: %0.1f, %0.1f, %i" % (w.offset_wave, w.next_minion_in, w.nr_minion))
             x += 20
 
         for w in self.logic.current_level.waves:
-            self.system.draw_string_at(x,22,"r: %0.1f, %i" % (w.next_minion_in, w.nr_minion))
+            self.system.draw_string_at(x, 22, \
+                "r: %0.1f, %i" % (w.next_minion_in, w.nr_minion))
             x += 15
 
 
@@ -151,7 +161,10 @@ class Middle:
             # was returned as an integer (ASCII); make it a character
             if char != -1:
                 if char == self.system.KEY_MOUSE:
-                    device_id, x, y, z, button = self.system.getmouse()
+                    #device_id, x, y, z, button = self.system.getmouse()
+                    ret = self.system.getmouse()
+                    x = ret[1]
+                    y = ret[2]
                     self.logic.add_tower(x, y)
                 else:
                     char = chr(char)

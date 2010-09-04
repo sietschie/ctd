@@ -1,11 +1,13 @@
+"""Handles communication with the system"""
 import curses
 
 class System:
+    """Handles communication with the system"""
     scrn = None # will point to window object
     mapping = {}
-    list_of_colors = [ curses.COLOR_BLACK, curses.COLOR_BLUE, curses.COLOR_CYAN,
-    curses.COLOR_GREEN, curses.COLOR_MAGENTA, curses.COLOR_RED, curses.COLOR_WHITE,
-    curses.COLOR_YELLOW  ]
+    list_of_colors = [ curses.COLOR_BLACK, curses.COLOR_BLUE, 
+    curses.COLOR_CYAN, curses.COLOR_GREEN, curses.COLOR_MAGENTA, 
+    curses.COLOR_RED, curses.COLOR_WHITE, curses.COLOR_YELLOW  ]
     KEY_MOUSE = curses.KEY_MOUSE
     COLOR_BLACK = curses.COLOR_BLACK
     COLOR_GREEN = curses.COLOR_GREEN
@@ -14,11 +16,13 @@ class System:
     getmouse = curses.getmouse
 
     def draw_at(self, coord_x, coord_y, char, color_fg, color_bg):
+        """puts char to screen"""
         self.scrn.addch(coord_y, coord_x, char, \
             curses.color_pair(self.mapping[color_fg, color_bg]))
             
-    def draw_string_at(self, coord_x, coord_y, str):
-        self.scrn.addstr(coord_y, coord_x, str)
+    def draw_string_at(self, coord_x, coord_y, string):
+        """puts string to screen"""
+        self.scrn.addstr(coord_y, coord_x, string)
 
     def __init__(self):
         # first we must create a window object; it will fill the whole screen
@@ -58,6 +62,7 @@ class System:
     # after the program exits
     @staticmethod
     def restorescreen():
+        """gets terminal back to normal state"""
         # restore "normal"--i.e. wait until hit Enter--keyboard mode
         curses.nocbreak()
         # restore keystroke echoing

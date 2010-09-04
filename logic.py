@@ -14,6 +14,7 @@ class Level:
         pass
         
     def send_next_wave(self):
+        """Makes the next wave active"""
         if self.next_wave:
             self.active_waves.append(self.next_wave)
             if self.waves:
@@ -23,15 +24,17 @@ class Level:
                 self.next_wave = None
         
     def update(self, delta):
+        """Updates the wave object"""
         if self.next_wave:
             self.next_wave.offset_wave -= delta
             if self.next_wave.offset_wave <= 0:
                 self.send_next_wave()
             
-        for w in self.active_waves:
-            w.update(delta)
+        for wave in self.active_waves:
+            wave.update(delta)
 
 class Wave:
+    """One wave of minions"""
     new_minion = False
     def __init__(self):
         self.next_minion_in = 0
@@ -41,6 +44,7 @@ class Wave:
         self.hp_minion = 0
         
     def update(self, delta):
+        """updates the status"""
         self.next_minion_in -= delta
         if self.next_minion_in <= 0:
             self.new_minion = True
@@ -91,7 +95,8 @@ class Tower(ScreenObject):
         """Computes the time when the bullet reaches the minion."""
         a = minion.dx * minion.dx + minion.dy * minion.dy - \
             bullet.speed * bullet.speed
-        b = 2 * (minion.x - self.x) * minion.dx + 2*(minion.y - self.y) * minion.dy
+        b = 2 * (minion.x - self.x) * minion.dx + 2*(minion.y -  \
+		    self.y) * minion.dy
         c = math.pow( minion.x - self.x , 2) + math.pow( minion.y - self.y, 2)
 
         if a == 0: #vllt mit epsilon?
@@ -179,7 +184,6 @@ class Minion(MovingObject):
                 diff_x = abs(self.x - current_waypoint[0])
                 diff_y = abs(self.y - current_waypoint[1])
             else:
-                end_reached = True
                 diff_x = 0
                 diff_y = 0
                 way_to_go = 0
@@ -299,14 +303,13 @@ class Logic:
                 self.bullets.append(bullet)
         
         self.current_level.update(delta)
-        for w in self.current_level.active_waves[:]:
-            if w.new_minion:
-                w.new_minion = False
-                w.nr_minion -= 1
+        for wave in self.current_level.active_waves[:]:
+            if wave.new_minion:
+                wave.new_minion = False
+                wave.nr_minion -= 1
                 self.add_minion()
-                if w.nr_minion == 0:
-                    self.current_level.active_waves.remove(w)
-                
+                if wave.nr_minion == 0:
+                    self.current_level.active_waves.remove(wave)
         
 
 

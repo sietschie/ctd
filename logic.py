@@ -255,7 +255,7 @@ class Logic:
 
 	def collision_detection(self):
 		"""Checks if bullet reached a minion. If yes, both are deleted."""
-		for bullet in self.bullets:
+		for bullet in self.bullets[:]:
 			if int(bullet.x) < 1:
 				self.bullets.remove(bullet)
 				continue
@@ -268,6 +268,9 @@ class Logic:
 			if int(bullet.y) > self.current_level.max_y:
 				self.bullets.remove(bullet)
 				continue
+
+		#TODO: nur ueber kopie der liste loopen
+		for bullet in self.bullets:
 			for minion in self.minions:
 				if int(bullet.x) == int(minion.x):
 					if int(bullet.y) == int(minion.y):

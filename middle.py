@@ -111,32 +111,28 @@ class Middle:
 			y = int( waypoint.getElementsByTagName('y')[0].firstChild.data )
 
 			level.waypoints[number] = [x, y]
+
+		wvs_tag = map_xml.getElementsByTagName('waves')
+		wv_tag = wvs_tag[0].getElementsByTagName('wave')
+
+		for wave in wv_tag:	
+			offset_wave = int( wave.getElementsByTagName('offset_wave')[0].firstChild.data )
+			offset_minion = int( wave.getElementsByTagName('offset_minion')[0].firstChild.data )
+			nr_minion = int( wave.getElementsByTagName('nr_minion')[0].firstChild.data )
+			hp_minion = int( wave.getElementsByTagName('hp_minion')[0].firstChild.data )
+
+			level.waypoints[number] = [x, y]
+
+			w = Wave()
+			w.offset_wave = offset_wave
+			w.offset_minion = offset_minion
+			w.hp_minion = hp_minion
+			w.nr_minion = nr_minion
+
+			level.waves.append(w)
 			
-		#TODO: load waves from file
-		w = Wave()
-		w.offset_wave = 1
-		w.offset_minion = 50
-		w.hp_minion = 1
-		w.nr_minion = 4
-
-		level.next_wave = w
-
-		w = Wave()
-		w.offset_wave = 150
-		w.offset_minion = 1
-		w.hp_minion = 1
-		w.nr_minion = 5
-
-		level.waves.append(w)
-
-		w = Wave()
-		w.offset_wave = 150
-		w.offset_minion = 0.5
-		w.hp_minion = 1
-		w.nr_minion = 5
-
-		level.waves.append(w)
-		
+		level.next_wave = level.waves[0]
+		level.waves.remove(level.next_wave)		
 
 		self.logic.current_level = level
 

@@ -29,4 +29,24 @@
 		<waypoint nr="1"><x>5</x><y>15</y></waypoint>
 		<waypoint nr="2"><x>20</x><y>15</y></waypoint>
 	</waypoints>
+	<waves>
+		<wave>
+			<offset_wave>2</offset_wave>
+			<offset_minion>5</offset_minion>
+			<nr_minion>4</nr_minion>
+			<hp_minion>1</hp_minion>
+		</wave>
+		<wave>
+			<offset_wave>30</offset_wave>
+			<offset_minion>4</offset_minion>
+			<nr_minion>8</nr_minion>
+			<hp_minion>1</hp_minion>
+		</wave>
+		<wave>
+			<offset_wave>30</offset_wave>
+			<offset_minion>3</offset_minion>
+			<nr_minion>12</nr_minion>
+			<hp_minion>1</hp_minion>
+		</wave>
+	</waves>
 </level>

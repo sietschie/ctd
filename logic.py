@@ -71,6 +71,7 @@ class Tower(ScreenObject):
     next_shoot_in = 0
     firing_range = 5
     speed = 3
+    firepower = 1
 
     def create_bullet(self, minion):
         """Creates a bullet object heading towards a minion 
@@ -78,6 +79,7 @@ class Tower(ScreenObject):
         """
         bullet =  Bullet()
         time = self.vorhalt(minion, bullet)
+        bullet.hitpoints = self.firepower
         bullet.x = float(self.x)
         bullet.y = float(self.y)
 
@@ -157,11 +159,13 @@ class Minion(MovingObject):
     y = 1
     speed = 1
     current_wp = 1
+    hitpoints = 0
     waypoints = None
 
-    def __init__(self, waypoints):
+    def __init__(self, waypoints, hitpoints):
         MovingObject.__init__(self)
         self.waypoints = waypoints
+        self.hitpoints = hitpoints
 
     def animate(self, delta):
         """Computes new position."""
@@ -202,6 +206,7 @@ class Minion(MovingObject):
 class Bullet(MovingObject):
     """A bullet flying down a straight line."""
     speed = 1.5
+    hitpoints = 1
 
     def animate(self, delta):
         """Computes new position."""
@@ -246,9 +251,9 @@ class Logic:
                             tower.y = y
                             self.towers.append(tower)
 
-    def add_minion(self):
+    def add_minion(self, hitpoints=1):
         """Adds minion on beginning of the pathway."""
-        self.minions.append(Minion(self.current_level.waypoints))
+        self.minions.append(Minion(self.current_level.waypoints, hitpoints))
 
     def check_for_finished_minions(self):
         """Check if minion reached end of pathway."""
@@ -274,15 +279,21 @@ class Logic:
                 continue
 
         #TODO: nur ueber kopie der liste loopen
-        for bullet in self.bullets:
+        for bullet in self.bullets[:]:
             for minion in self.minions:
-                if int(bullet.x) == int(minion.x):
-                    if int(bullet.y) == int(minion.y):
-                        self.bullets.remove(bullet)
-                        self.minions.remove(minion)
-                        self.points += 1
-                        self.money += 1
-                        break
+                if minion.hitpoints > 0:
+                    if int(bullet.x) == int(minion.x):
+                        if int(bullet.y) == int(minion.y):
+                            minion.hitpoints -= bullet.hitpoints
+                            self.bullets.remove(bullet)
+                            break
+
+        for minion in self.minions[:]:
+            if minion.hitpoints <= 0:
+                self.minions.remove(minion)
+                self.points += 1
+                self.money += 1
+                
 
     def animate(self, delta):
         """Computes new state of the game."""
@@ -307,7 +318,7 @@ class Logic:
             if wave.new_minion:
                 wave.new_minion = False
                 wave.nr_minion -= 1
-                self.add_minion()
+                self.add_minion(wave.hp_minion)
                 if wave.nr_minion == 0:
                     self.current_level.active_waves.remove(wave)
         

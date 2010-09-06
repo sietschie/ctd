@@ -1,5 +1,6 @@
 """Handles communication with the system"""
 import curses
+from vector import Vector
 
 class System:
     """Handles communication with the system"""
@@ -15,9 +16,9 @@ class System:
     getch = None
     getmouse = curses.getmouse
 
-    def draw_at(self, coord_x, coord_y, char, color_fg, color_bg):
+    def draw_at(self, coord, char, color_fg, color_bg):
         """puts char to screen"""
-        self.scrn.addch(coord_y, coord_x, char, \
+        self.scrn.addch(int(coord.y), int(coord.x), char, \
             curses.color_pair(self.mapping[color_fg, color_bg]))
             
     def draw_string_at(self, coord_x, coord_y, string):

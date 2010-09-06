@@ -1,5 +1,6 @@
 """Handles the general game logic"""
 import math
+from vector import Vector
 
 class Level:
     """Contains the description of a level"""
@@ -54,17 +55,14 @@ class Wave:
 
 class ScreenObject:
     """An Object that appears on screen"""
-    x = 0
-    y = 0
-    def __init__(self):
-        pass
+    def __init__(self, vec):
+        self.pos = vec
 
 class MovingObject(ScreenObject):
     """A moving object"""
-    dx = 0
-    dy = 0
-    def __init__(self):
-        ScreenObject.__init__(self)
+    def __init__(self, pos, dir = Vector(0, 0)):
+        ScreenObject.__init__(self, pos)
+        self.dir = dir
 
 class Tower(ScreenObject):
     """A tower shooting bullets"""
@@ -77,29 +75,23 @@ class Tower(ScreenObject):
         """Creates a bullet object heading towards a minion 
         and returns that object.
         """
-        bullet =  Bullet()
+        bullet =  Bullet(self.pos)
         time = self.vorhalt(minion, bullet)
         bullet.hitpoints = self.firepower
-        bullet.x = float(self.x)
-        bullet.y = float(self.y)
 
-        diff_x = (minion.x + time * minion.dx) - bullet.x
-        diff_y = (minion.y + time * minion.dy) - bullet.y
-
-        dist = math.sqrt( diff_x * diff_x + diff_y * diff_y )
-
-        bullet.dx = bullet.speed * float(diff_x) / float(dist)
-        bullet.dy = bullet.speed * float(diff_y) / float(dist)
-
+        diff = (minion.pos + minion.dir * time) - bullet.pos
+        bullet.dir = diff.set_length(bullet.speed)
+        
         return bullet
 
     def vorhalt(self, minion, bullet):
         """Computes the time when the bullet reaches the minion."""
-        a = minion.dx * minion.dx + minion.dy * minion.dy - \
-            bullet.speed * bullet.speed
-        b = 2 * (minion.x - self.x) * minion.dx + 2*(minion.y -  \
-		    self.y) * minion.dy
-        c = math.pow( minion.x - self.x , 2) + math.pow( minion.y - self.y, 2)
+        a = minion.dir.x**2 + minion.dir.y**2 - \
+            bullet.speed**2
+        b = 2 * (minion.pos.x - self.pos.x) * minion.dir.x + \
+            2 * (minion.pos.y - self.pos.y) * minion.dir.y
+        c = math.pow( minion.pos.x - self.pos.x , 2) + \
+            math.pow( minion.pos.y - self.pos.y , 2)
 
         if a == 0: #vllt mit epsilon?
             time = -c / b
@@ -126,11 +118,8 @@ class Tower(ScreenObject):
         min_dist = 100000
         min_min = 0
         for minion in minions:
-            diff_x = self.x - minion.x
-            diff_y = self.y - minion.y
-
-            dist = math.sqrt( diff_x * diff_x + diff_y * diff_y )
-
+            dist = self.pos.Distance(minion.pos)
+            
             if dist < min_dist:
                 min_dist = dist
                 min_min = minion
@@ -155,53 +144,59 @@ class Tower(ScreenObject):
 
 class Minion(MovingObject):
     """A normal minion moving down the pathway."""
-    x = 5
-    y = 1
     speed = 1
     current_wp = 1
     hitpoints = 0
     waypoints = None
+    dwp = 5
+    wtg = 0
+    cwp = Vector(0,0)
 
     def __init__(self, waypoints, hitpoints):
-        MovingObject.__init__(self)
+        MovingObject.__init__(self,waypoints[0])
         self.waypoints = waypoints
         self.hitpoints = hitpoints
+        self.current_wp = 1
+        current_waypoint = self.waypoints[self.current_wp]
+        self.dir = (current_waypoint - self.pos).set_length(self.speed)
+
+    def __str__(self):
+        return "(pos:" + str(self.pos) + \
+            ", dir:" + str(self.dir) + \
+            ", hp:" + str(self.hitpoints) + ")"
+            #", cw:" + str(self.current_wp) + \
+            #", dwp:" + str(self.dwp) + \
+            #", wtg:" + str(self.wtg) + \
+            #", cwp:" + str(self.cwp) + \
+            #")"
+
+    def check_if_wp_passed(self, delta):
+        current_waypoint = self.waypoints[self.current_wp]
+        dist_to_cw = self.pos.Distance(current_waypoint)
+        way_to_go = delta*self.speed
+        
+        self.dwp = dist_to_cw
+        self.wtg = way_to_go
+        self.cwp = current_waypoint
+
+        while dist_to_cw < way_to_go: # go to next wp
+            way_to_go -= dist_to_cw
+            self.pos = current_waypoint
+            self.current_wp += 1
+            #TODO: while loop, in case more than one wp passed in one step
+            if self.current_wp >= len(self.waypoints):
+                return 0.0
+
+            current_waypoint = self.waypoints[self.current_wp]
+            dist_to_cw = self.pos.Distance(current_waypoint)
+            self.dir = (current_waypoint - self.pos).set_length(self.speed)
+
+        return way_to_go / self.speed
 
     def animate(self, delta):
         """Computes new position."""
-        #TODO: negative dx erlauben
-        current_waypoint = self.waypoints[self.current_wp]
-        diff_x = abs(self.x - current_waypoint[0])
-        diff_y = abs(self.y - current_waypoint[1])
-        if diff_x > diff_y:
-            dist_to_cw = diff_x
-        else:
-            dist_to_cw = diff_y
-
-        if dist_to_cw < delta*self.speed: # go to next wp
-            way_to_go = delta*self.speed - dist_to_cw
-            self.x = current_waypoint[0]
-            self.y = current_waypoint[1]
-            self.current_wp += 1
-            if self.current_wp < len(self.waypoints):
-                current_waypoint = self.waypoints[self.current_wp]
-                diff_x = abs(self.x - current_waypoint[0])
-                diff_y = abs(self.y - current_waypoint[1])
-            else:
-                diff_x = 0
-                diff_y = 0
-                way_to_go = 0
-        else:
-            way_to_go = delta*self.speed
-        if diff_x > diff_y:
-            self.x += way_to_go
-            self.dx = self.speed
-            self.dy = 0
-        else:
-            self.y += way_to_go        
-            self.dx = 0
-            self.dy = self.speed
-
+        delta_res = self.check_if_wp_passed(delta)
+        self.pos += self.dir * delta_res
 
 class Bullet(MovingObject):
     """A bullet flying down a straight line."""
@@ -210,8 +205,7 @@ class Bullet(MovingObject):
 
     def animate(self, delta):
         """Computes new position."""
-        self.x += delta * self.dx
-        self.y += delta * self.dy
+        self.pos += self.dir * delta
 
 
 class Logic:
@@ -243,12 +237,10 @@ class Logic:
                     if y <= self.current_level.max_y:
                         if self.current_level.tiles[x, y] == 0:
                             for tower in self.towers:
-                                if tower.x == x: 
-                                    if tower.y == y:
+                                if tower.pos.x == x: 
+                                    if tower.pos.y == y:
                                         return
-                            tower = Tower()
-                            tower.x = x
-                            tower.y = y
+                            tower = Tower(Vector(x, y))
                             self.towers.append(tower)
 
     def add_minion(self, hitpoints=1):
@@ -265,25 +257,25 @@ class Logic:
     def collision_detection(self):
         """Checks if bullet reached a minion. If yes, both are deleted."""
         for bullet in self.bullets[:]:
-            if int(bullet.x) < 1:
+            if int(bullet.pos.x) < 1:
                 self.bullets.remove(bullet)
                 continue
-            if int(bullet.x) > self.current_level.max_x:
+            if int(bullet.pos.x) > self.current_level.max_x:
                 self.bullets.remove(bullet)
                 continue
-            if int(bullet.y) < 1:
+            if int(bullet.pos.y) < 1:
                 self.bullets.remove(bullet)
                 continue
-            if int(bullet.y) > self.current_level.max_y:
+            if int(bullet.pos.y) > self.current_level.max_y:
                 self.bullets.remove(bullet)
                 continue
 
-        #TODO: nur ueber kopie der liste loopen
         for bullet in self.bullets[:]:
             for minion in self.minions:
                 if minion.hitpoints > 0:
-                    if int(bullet.x) == int(minion.x):
-                        if int(bullet.y) == int(minion.y):
+                    #TODO: pos1 == pos2
+                    if int(bullet.pos.x) == int(minion.pos.x):
+                        if int(bullet.pos.y) == int(minion.pos.y):
                             minion.hitpoints -= bullet.hitpoints
                             self.bullets.remove(bullet)
                             break

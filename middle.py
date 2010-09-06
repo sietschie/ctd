@@ -3,6 +3,7 @@ import time
 from xml.dom import minidom
 from system import System
 from logic import Logic, Level, Wave
+from vector import Vector
 
 
 # global variables
@@ -34,23 +35,23 @@ class Middle:
     def draw_minions(self):
         """Draws minions to screen."""
         for minion in self.logic.minions:
-            self.system.draw_at(int(minion.x), int(minion.y), 'o', 
+            self.system.draw_at(minion.pos.to_int(), 'o', 
                 self.system.COLOR_BLACK, self.system.COLOR_YELLOW)
 
     def draw_bullets(self):
         """Draws bullets to screen."""
         for bullet in self.logic.bullets:
-            if self.logic.current_level.tiles[int(bullet.x), int(bullet.y)] == 0:
-                self.system.draw_at(int(bullet.x), int(bullet.y), '*', 
+            if self.logic.current_level.tiles[int(bullet.pos.x), int(bullet.pos.y)] == 0:
+                self.system.draw_at(bullet.pos.to_int(), '*', 
                     self.system.COLOR_BLACK, self.system.COLOR_GREEN)
             else:
-                self.system.draw_at(int(bullet.x), int(bullet.y), '*', 
+                self.system.draw_at(bullet.pos.to_int(), '*', 
                     self.system.COLOR_BLACK, self.system.COLOR_YELLOW)
 
     def draw_towers(self):
         """Draws towers to screen."""
         for tower in self.logic.towers:
-            self.system.draw_at(int(tower.x), int(tower.y), '#', 
+            self.system.draw_at(tower.pos.to_int(), '#', 
                 self.system.COLOR_BLACK, self.system.COLOR_GREEN)
 
     def draw_map(self):
@@ -58,10 +59,10 @@ class Middle:
         for x in range(1, 21):
             for y in range(1, 21):
                 if self.logic.current_level.tiles[x, y] == 0:
-                    self.system.draw_at(x, y, ' ', 
+                    self.system.draw_at(Vector(x, y), ' ', 
                         self.system.COLOR_GREEN, self.system.COLOR_GREEN)
                 else:
-                    self.system.draw_at(x, y, ' ', 
+                    self.system.draw_at(Vector(x, y), ' ', 
                         self.system.COLOR_YELLOW, self.system.COLOR_YELLOW)
                         
     def draw_hud(self):
@@ -71,11 +72,11 @@ class Middle:
         self.system.draw_string_at(25, 7, "money:  %03d" % self.logic.money )
         self.system.draw_string_at(25, 8, "num minions:  %03d" % len(self.logic.minions) )
 
-        if self.logic.minions:
-            self.system.draw_string_at(25, 9, \
-                "minion[0].x:  %f" % (self.logic.minions[0].x) )
-            self.system.draw_string_at(25, 10, \
-                "minion[0].y:  %f" % (self.logic.minions[0].y) )
+        y = 0
+        for minion in self.logic.minions:
+            self.system.draw_string_at(25, 9 + y, \
+                "minion[" + str(y) + "]:  %s" % str(minion) )
+            y += 1
 
         x = 1
         for w in self.logic.current_level.active_waves:
@@ -121,7 +122,7 @@ class Middle:
             x = int( get_data(waypoint,'x'))
             y = int( get_data(waypoint,'y'))
 
-            level.waypoints[number] = [x, y]
+            level.waypoints[number] = Vector(x, y)
 
         for wave in map_xml.getElementsByTagName('wave'):    
             w = Wave()
@@ -174,7 +175,7 @@ class Middle:
             self.draw_towers()
             self.draw_bullets()
             self.draw_hud()
-            time.sleep(0.01)
+            time.sleep(0.1)
 
         # restore original settings
         self.system.restorescreen()

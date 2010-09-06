@@ -3,7 +3,6 @@ game concepts
 - level up tower
 
 refactoring
-- add coordinate class
 - communicate with events(?)
 - add constructors and getter/setter methods
 - round to next integer instead of round down(?)

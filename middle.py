@@ -4,6 +4,8 @@ from xml.dom import minidom
 from system import System
 from logic import Logic, Level, Wave
 from vector import Vector
+from eventmanager import EventManager
+from events import KeyPressEvent, MouseClickEvent
 
 
 # global variables
@@ -15,9 +17,6 @@ class Middle:
     current_time = 0
     last_time = 0
     delta = current_time - last_time
-
-    system = System()
-    logic = Logic()
 
     @staticmethod
     def restore():
@@ -138,35 +137,39 @@ class Middle:
 
         self.logic.current_level = level
 
+    def Notify(self, event):
+        if isinstance( event, KeyPressEvent ):
+            if event.key == 'q': 
+                self.running = False
+            if event.key == 'a':
+                self.logic.add_minion()
+            if event.key == ' ':
+                self.logic.current_level.send_next_wave()
+                
+        elif isinstance( event, MouseClickEvent ):
+            self.logic.add_tower(event.pos.x, event.pos.y)
     def __init__(self):
+        self.evm = EventManager()
+        
+        self.evm.RegisterListener(self)
+        
+        self.system = System(self.evm)
+        self.logic = Logic()
+        
         self.load_map('map.xml')
 
         self.last_time = time.time()
         self.current_time =  time.time()
+        
+        self.running = True
 
 
     def run(self):
         """The main game loop"""
-        while True:
-            # read character from keyboard
-            char = self.system.getch()
-            # was returned as an integer (ASCII); make it a character
-            if char != -1:
-                if char == self.system.KEY_MOUSE:
-                    #device_id, x, y, z, button = self.system.getmouse()
-                    ret = self.system.getmouse()
-                    x = ret[1]
-                    y = ret[2]
-                    self.logic.add_tower(x, y)
-                else:
-                    char = chr(char)
-                    # quit?
-                    if char == 'q': 
-                        break
-                    if char == 'a':
-                        self.logic.add_minion()
-                    if char == ' ':
-                        self.logic.current_level.send_next_wave()
+        while self.running:
+            self.system.update()
+            self.evm.SendAll()
+
             self.update_time()
             self.logic.animate(self.delta)
             self.system.scrn.erase()

@@ -1,4 +1,5 @@
 from weakref import WeakKeyDictionary
+from events import TickEvent
 
 class EventManager:
     """this object is responsible for coordinating most communication
@@ -19,7 +20,22 @@ class EventManager:
         
     #----------------------------------------------------------------------
     def Post( self, event ):
-        self.eventQueue.append(event)
+        from copy import copy
+        if not isinstance(event, TickEvent): 
+            self.eventQueue.append( event )
+        else:
+            events = copy( self.eventQueue )
+            self.eventQueue = []
+            while len(events) > 0:
+                ev = events.pop(0)
+                #self.Debug( ev )
+
+                for listener in self.listeners.keys():
+                    listener.Notify( ev )
+
+            #at the end, notify listeners of the Tick event
+            for listener in self.listeners.keys():
+                listener.Notify( event )
         
     def Send( self, event ):
         for listener in self.listeners.keys():

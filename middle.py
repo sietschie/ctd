@@ -1,11 +1,11 @@
 """This Module glues together the logic and the system modules."""
-import time
 from xml.dom import minidom
 from system import System
 from logic import Logic, Level, Wave
 from vector import Vector
 from eventmanager import EventManager
-from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent
+from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent, QuitEvent, TickEvent
+from tickemitter import TickEmitter
 
 
 # global variables
@@ -14,22 +14,12 @@ class Middle:
     the screen.
     """
 
-    current_time = 0
-    last_time = 0
-    delta = current_time - last_time
-
     @staticmethod
     def restore():
         """things to before shutdown"""
         System.restorescreen()
 
-    def update_time(self):
-        """computes difference between last and current time, 
-        result in delta
-        """
-        self.last_time = self.current_time
-        self.current_time = time.time()
-        self.delta = self.current_time - self.last_time
+
             
     def draw_minions(self):
         """Draws minions to screen."""
@@ -140,7 +130,7 @@ class Middle:
     def Notify(self, event):
         if isinstance( event, KeyPressEvent ):
             if event.key == 'q': 
-                self.running = False
+                self.evm.Post(QuitEvent())
             if event.key == 'a':
                 self.logic.add_minion()
             if event.key == ' ':
@@ -148,31 +138,9 @@ class Middle:
                 
         elif isinstance( event, MouseClickEvent ):
             self.logic.add_tower(event.pos.x, event.pos.y)
-
-    def __init__(self):
-        self.evm = EventManager()
-        
-        self.evm.RegisterListener(self)
-        
-        self.system = System(self.evm)
-        self.logic = Logic()
-        
-        self.load_map('map.xml')
-
-        self.last_time = time.time()
-        self.current_time =  time.time()
-        
-        self.running = True
-
-
-    def run(self):
-        """The main game loop"""
-        while self.running:
-            self.system.update()
-            self.evm.SendAll()
-
-            self.update_time()
-            self.logic.animate(self.delta)
+        elif isinstance( event, TickEvent ):
+            delta = event.delta
+            self.logic.animate(delta)
             
             self.evm.Send(ClearScreenEvent())
 
@@ -181,7 +149,24 @@ class Middle:
             self.draw_towers()
             self.draw_bullets()
             self.draw_hud()
-            time.sleep(0.1)
+
+    def __init__(self):
+        self.evm = EventManager()
+        
+        self.evm.RegisterListener(self)
+        
+        self.te = TickEmitter(self.evm)
+        
+        self.system = System(self.evm)
+        self.logic = Logic()
+        
+        self.load_map('map.xml')
+
+    def run(self):
+        """The main game loop"""
+        self.te.Run()
+
+
 
         # restore original settings
         self.system.restorescreen()

@@ -22,3 +22,12 @@ class MouseClickEvent(InputEvent):
 class ClearScreenEvent(Event):
     def __init__(self):
         self.name = "Clear Screen Event"
+
+class TickEvent(Event):
+    def __init__(self, delta):
+        self.name = "CPU Tick Event"
+        self.delta = delta
+        
+class QuitEvent(Event):
+    def __init__(self):
+        self.name = "Program Quit Event"

@@ -1,7 +1,7 @@
 """Handles communication with the system"""
 import curses
 from vector import Vector
-from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent
+from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent, TickEvent
 
 class System:
     """Handles communication with the system"""
@@ -41,6 +41,8 @@ class System:
     def Notify(self, event):
         if isinstance( event, ClearScreenEvent ):
             self.scrn.erase()
+        elif isinstance( event, TickEvent ):
+            self.update()
 
     def __init__(self, evm):
         self.evm = evm

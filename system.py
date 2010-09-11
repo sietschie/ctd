@@ -1,7 +1,7 @@
 """Handles communication with the system"""
 import curses
 from vector import Vector
-from events import KeyPressEvent, MouseClickEvent
+from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent
 
 class System:
     """Handles communication with the system"""
@@ -38,8 +38,13 @@ class System:
                 char = chr(char)
                 self.evm.Post(KeyPressEvent(char))
 
+    def Notify(self, event):
+        if isinstance( event, ClearScreenEvent ):
+            self.scrn.erase()
+
     def __init__(self, evm):
         self.evm = evm
+        evm.RegisterListener(self)
         # first we must create a window object; it will fill the whole screen
         self.scrn = curses.initscr()
         # turn off keystroke echo

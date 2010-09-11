@@ -5,7 +5,7 @@ from system import System
 from logic import Logic, Level, Wave
 from vector import Vector
 from eventmanager import EventManager
-from events import KeyPressEvent, MouseClickEvent
+from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent
 
 
 # global variables
@@ -148,6 +148,7 @@ class Middle:
                 
         elif isinstance( event, MouseClickEvent ):
             self.logic.add_tower(event.pos.x, event.pos.y)
+
     def __init__(self):
         self.evm = EventManager()
         
@@ -172,7 +173,9 @@ class Middle:
 
             self.update_time()
             self.logic.animate(self.delta)
-            self.system.scrn.erase()
+            
+            self.evm.Send(ClearScreenEvent())
+
             self.draw_map()
             self.draw_minions()
             self.draw_towers()

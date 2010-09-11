@@ -4,13 +4,21 @@ class Event:
     def __init__(self):
         self.name = "Generic Event"
 
-class KeyPressEvent(Event):
+class InputEvent(Event):
+    def __init__(self):
+        self.name = "Input Event"
+
+class KeyPressEvent(InputEvent):
     def __init__(self, key):
         self.name = "Keypress Event"
         self.key = key
 
-class MouseClickEvent(Event):
+class MouseClickEvent(InputEvent):
     def __init__(self, button, pos):
         self.name = "Mouse Click Event"
         self.button = button
         self.pos = pos
+
+class ClearScreenEvent(Event):
+    def __init__(self):
+        self.name = "Clear Screen Event"

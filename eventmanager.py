@@ -20,7 +20,11 @@ class EventManager:
     #----------------------------------------------------------------------
     def Post( self, event ):
         self.eventQueue.append(event)
-
+        
+    def Send( self, event ):
+        for listener in self.listeners.keys():
+            listener.Notify( event )
+            
     def SendAll( self ):
         from copy import copy
         events = copy( self.eventQueue )

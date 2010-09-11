@@ -1,6 +1,7 @@
 """Handles communication with the system"""
 import curses
 from vector import Vector
+from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent, TickEvent
 
 class System:
     """Handles communication with the system"""
@@ -9,12 +10,9 @@ class System:
     list_of_colors = [ curses.COLOR_BLACK, curses.COLOR_BLUE, 
     curses.COLOR_CYAN, curses.COLOR_GREEN, curses.COLOR_MAGENTA, 
     curses.COLOR_RED, curses.COLOR_WHITE, curses.COLOR_YELLOW  ]
-    KEY_MOUSE = curses.KEY_MOUSE
     COLOR_BLACK = curses.COLOR_BLACK
     COLOR_GREEN = curses.COLOR_GREEN
     COLOR_YELLOW = curses.COLOR_YELLOW
-    getch = None
-    getmouse = curses.getmouse
 
     def draw_at(self, coord, char, color_fg, color_bg):
         """puts char to screen"""
@@ -24,8 +22,31 @@ class System:
     def draw_string_at(self, coord_x, coord_y, string):
         """puts string to screen"""
         self.scrn.addstr(coord_y, coord_x, string)
+        
+    def update(self):
+        char = self.scrn.getch()
+        # was returned as an integer (ASCII); make it a character
+        if char != -1:
+            if char == curses.KEY_MOUSE:
+                #device_id, x, y, z, button = self.system.getmouse()
+                ret = curses.getmouse()
+                x = ret[1]
+                y = ret[2]
+                button = ret[4]
+                self.evm.Post(MouseClickEvent(button, Vector(x,y)))
+            else:
+                char = chr(char)
+                self.evm.Post(KeyPressEvent(char))
 
-    def __init__(self):
+    def Notify(self, event):
+        if isinstance( event, ClearScreenEvent ):
+            self.scrn.erase()
+        elif isinstance( event, TickEvent ):
+            self.update()
+
+    def __init__(self, evm):
+        self.evm = evm
+        evm.RegisterListener(self)
         # first we must create a window object; it will fill the whole screen
         self.scrn = curses.initscr()
         # turn off keystroke echo
@@ -41,8 +62,6 @@ class System:
         curses.start_color()
 
         curses.mousemask(curses.BUTTON1_PRESSED)
-
-        self.getch = self.scrn.getch
 
         # clear screen
         self.scrn.clear()

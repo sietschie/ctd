@@ -1,6 +1,7 @@
 """Handles the general game logic"""
 import math
 from vector import Vector
+from events import TickEvent
 
 class Level:
     """Contains the description of a level"""
@@ -218,7 +219,10 @@ class Logic:
     points = None
     lives = None
 
-    def __init__(self):
+    def __init__(self, evm):
+        self.evm = evm
+        evm.RegisterListener(self)
+
         self.money = 10
         self.points = 0
         self.lives = 5
@@ -286,6 +290,9 @@ class Logic:
                 self.points += 1
                 self.money += 1
                 
+    def Notify(self, event):
+        if isinstance( event, TickEvent ):
+            self.animate(event.delta)
 
     def animate(self, delta):
         """Computes new state of the game."""

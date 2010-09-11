@@ -139,11 +139,7 @@ class Middle:
         elif isinstance( event, MouseClickEvent ):
             self.logic.add_tower(event.pos.x, event.pos.y)
         elif isinstance( event, TickEvent ):
-            delta = event.delta
-            self.logic.animate(delta)
-            
             self.evm.Send(ClearScreenEvent())
-
             self.draw_map()
             self.draw_minions()
             self.draw_towers()
@@ -158,7 +154,7 @@ class Middle:
         self.te = TickEmitter(self.evm)
         
         self.system = System(self.evm)
-        self.logic = Logic()
+        self.logic = Logic(self.evm)
         
         self.load_map('map.xml')
 

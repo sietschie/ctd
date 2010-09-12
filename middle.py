@@ -8,7 +8,79 @@ from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent, QuitEvent, 
 from tickemitter import TickEmitter
 from inputrecorder import InputRecorder, InputPlayer
 
+class Widget:
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height      
+        self.border = True
+        self.invert = False  
+        self.label = "Hello World"
+        self.children = []
+        self.offset = (0,0)
+        
+    def add_child(self, child):
+        self.children.append(child)
+        child.set_offset((self.x, self.y))
+        
+    def set_offset(self, offset):
+        self.offset = offset
+        child_offset = (offset[0] + self.x, offset[1] + self.y )
+        for w in self.children:
+            w.set_offset(child_offset)
+                        
+class WidgetController:
+    def __init__(self, evm, system):
+        self.evm = evm
+        evm.RegisterListener(self)
+        
+        self.system = system
+        (max_x, max_y) = system.scrn.getmaxyx()
 
+    def Notify(self, event):
+        pass
+
+    def draw_widgets(self, widget):
+        stack = [widget]
+        
+        while stack:
+            w = stack.pop()
+            stack.extend(w.children)
+            self.draw_widget(w)
+        #current_position = (0,0)
+        
+        
+    def draw_widget(self, widget):
+        self.draw_border(widget)
+        self.draw_label(widget)
+        
+    def draw_label(self, widget):   
+        width = widget.width
+        height = widget.height
+        x = widget.x + widget.offset[0]
+        y = widget.y + widget.offset[1]
+        label = widget.label
+        size = len(label)
+        
+        pos_x = int(x + (width+1)/2 - (size + 1)/2)
+        pos_y = int(y + height/2)
+        
+        self.system.draw_string_at(pos_x, pos_y, label)
+        
+    def draw_border(self, widget):   
+        width = widget.width
+        height = widget.height
+        x = widget.x + widget.offset[0]
+        y = widget.y + widget.offset[1]
+        
+        border_line = '+'+((width - 2)*'-')+'+'
+        self.system.draw_string_at(x, y, border_line)
+        self.system.draw_string_at(x, y + height - 1, border_line)
+        for i in range(1, height-1):
+            self.system.draw_string_at(x, y + i, '|')
+            self.system.draw_string_at(width + x - 1, y + i, '|')
+        
 # global variables
 class Middle:
     """It handles the input, keeps track of time and draws objects to
@@ -146,6 +218,8 @@ class Middle:
             self.draw_towers()
             self.draw_bullets()
             self.draw_hud()
+            
+            self.wc.draw_widgets(self.window)
 
     def __init__(self):
 
@@ -175,6 +249,17 @@ class Middle:
             self.input_recorder = InputRecorder(self.evm, options.outfile)
         
         self.load_map('map.xml')
+        
+        self.window = Widget(80,5,25,25)
+        self.window.label = 'Hello Wor'
+
+        window2 = Widget(1,1,10,10)
+        window3 = Widget(3,12,10,10)
+
+        self.window.add_child(window2)
+        self.window.add_child(window3)
+
+        self.wc = WidgetController(self.evm,self.system)
 
     def run(self):
         """The main game loop"""

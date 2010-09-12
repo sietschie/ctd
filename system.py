@@ -63,6 +63,8 @@ class System:
 
         curses.mousemask(curses.BUTTON1_PRESSED)
 
+        curses.curs_set(0)
+
         # clear screen
         self.scrn.clear()
 

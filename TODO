@@ -1,12 +1,19 @@
+roadmap for 0.2
+- 1 level, 1 kind of tower, decent gui
+
 game concepts
 - money and score proportional to hitpoints
 - level up tower
 - different kinds of bullets (rockets, laser)
 - more levels
+- level editor
 
 refactoring
 - communicate with events(?)
   - from logic to middle
+  - dont send all events to everyone
+- speed up game
+  - don't redraw everything all the time
 - menu manager/widget system(?)
 - add constructors and getter/setter methods
 - round to next integer instead of round down(?)
@@ -15,3 +22,4 @@ refactoring
 - logfile
 - record input, simulate afterwards
   - save levels with recordings(?)
+- create a snapshot of the ingame data

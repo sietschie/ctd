@@ -6,6 +6,7 @@ from vector import Vector
 from eventmanager import EventManager
 from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent, QuitEvent, TickEvent
 from tickemitter import TickEmitter
+from inputrecorder import InputRecorder, InputPlayer
 
 
 # global variables
@@ -147,22 +148,37 @@ class Middle:
             self.draw_hud()
 
     def __init__(self):
+
+        from optparse import OptionParser
+        parser = OptionParser(version="%prog 0.1.1")
+        parser.add_option('-r', '--replay', 
+                            dest='infile',
+                            help='uses the recorded input instead of the user input')
+        parser.add_option('-d', '--dump', 
+                            dest='outfile',
+                            help='writes the user input into a file')
+        (options, args) = parser.parse_args()
+        
         self.evm = EventManager()
         
         self.evm.RegisterListener(self)
-        
-        self.te = TickEmitter(self.evm)
+
+        if options.infile:
+            self.te = InputPlayer(self.evm, options.infile)
+        else:
+            self.te = TickEmitter(self.evm)
         
         self.system = System(self.evm)
         self.logic = Logic(self.evm)
+        
+        if options.outfile:
+            self.input_recorder = InputRecorder(self.evm, options.outfile)
         
         self.load_map('map.xml')
 
     def run(self):
         """The main game loop"""
         self.te.Run()
-
-
 
         # restore original settings
         self.system.restorescreen()

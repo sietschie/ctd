@@ -9,3 +9,5 @@ Click anywhere on the map to place a tower.
 
 If there are no more minions or you lost all your lives the game 
 quits.
+
+![Screenshot of the game](http://lh5.ggpht.com/_4ADYQhSkXYA/TJOPoEBlJRI/AAAAAAAAABg/_HT7gpoauHk/s800/Screenshot.png "Screenshot")

@@ -8,6 +8,8 @@ game concepts
 - more levels
 - level editor
 - end game with 0 lives
+- end game, when no minions left
+- show hotkeys somewhere on screen
 
 refactoring
 - framecounter

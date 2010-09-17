@@ -9,6 +9,7 @@ game concepts
 - level editor
 
 refactoring
+- framecounter
 - communicate with events(?)
   - from logic to middle
   - dont send all events to everyone
@@ -23,3 +24,6 @@ refactoring
 - record input, simulate afterwards
   - save levels with recordings(?)
 - create a snapshot of the ingame data
+- mvc-division
+  - refactor level
+- use ncurses wrapper method

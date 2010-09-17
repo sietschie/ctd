@@ -1,10 +1,38 @@
+roadmap for 0.2
+- 1 level, 1 kind of tower, decent gui
+
 game concepts
 - money and score proportional to hitpoints
 - level up tower
+- different kinds of bullets (rockets, laser)
+- more levels
+- level editor
+- end game with 0 lives
+- end game, when no minions left
+- show hotkeys somewhere on screen
+- add text to the readme
+- add buttons
+- bug: multiple towers on same spot
 
 refactoring
+- framecounter
 - communicate with events(?)
+  - from logic to middle
+  - dont send all events to everyone
+- speed up game
+  - don't redraw everything all the time
+- menu manager/widget system(?)
 - add constructors and getter/setter methods
 - round to next integer instead of round down(?)
 - add some __str__ methods
 - add regression test, test speed
+- logfile
+- record input, simulate afterwards
+  - save levels with recordings(?)
+- create a snapshot of the ingame data
+- mvc-division
+  - refactor level
+- use ncurses wrapper method
+- get a good pylint score
+- blinking wave window if wave is currently sending
+- make programme cope with window resizing

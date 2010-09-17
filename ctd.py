@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """Init and start Game, handles Exceptions."""
 import traceback
 from middle import Middle

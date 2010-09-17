@@ -101,19 +101,21 @@ class WidgetController:
         y = widget.y + widget.offset[1]
         
         if widget.border_bold:
-            border_line = '█'+((width - 2)*'█')+'█'
+            border_line = '┏'+((width - 2)*'━')+'┓'
             self.system.draw_string_at(x, y, border_line)
+            border_line = '┗'+((width - 2)*'━')+'┛'
             self.system.draw_string_at(x, y + height - 1, border_line)
             for i in range(1, height-1):
-                self.system.draw_string_at(x, y + i, '█')
-                self.system.draw_string_at(width + x - 1, y + i, '█')
+                self.system.draw_string_at(x, y + i, '┃')
+                self.system.draw_string_at(width + x - 1, y + i, '┃')
         else:
-            border_line = '+'+((width - 2)*'-')+'+'
+            border_line = '┌'+((width - 2)*'─')+'┐'
             self.system.draw_string_at(x, y, border_line)
+            border_line = '└'+((width - 2)*'─')+'┘'
             self.system.draw_string_at(x, y + height - 1, border_line)
             for i in range(1, height-1):
-                self.system.draw_string_at(x, y + i, '|')
-                self.system.draw_string_at(width + x - 1, y + i, '|')
+                self.system.draw_string_at(x, y + i, '│')
+                self.system.draw_string_at(width + x - 1, y + i, '│')
         
 # global variables
 class Middle:

@@ -16,7 +16,7 @@ class Vorhalt(unittest.TestCase):
                 res = t.vorhalt(m,b)
                 
                 m.animate(res)
-                delta = 1
+                #delta = 1
                 #print(str(t.pos) + "  " + str(res))
                 #print(str(m.pos))
                 self.failUnlessAlmostEqual(m.pos.Distance(t.pos), b.speed * res,12)

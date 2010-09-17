@@ -63,9 +63,9 @@ class ScreenObject:
 
 class MovingObject(ScreenObject):
     """A moving object"""
-    def __init__(self, pos, dir = Vector(0, 0)):
+    def __init__(self, pos, direction = Vector(0, 0)):
         ScreenObject.__init__(self, pos)
-        self.dir = dir
+        self.dir = direction
 
 class Tower(ScreenObject):
     """A tower shooting bullets"""
@@ -186,7 +186,6 @@ class Minion(MovingObject):
             way_to_go -= dist_to_cw
             self.pos = current_waypoint
             self.current_wp += 1
-            #TODO: while loop, in case more than one wp passed in one step
             if self.current_wp >= len(self.waypoints):
                 return 0.0
 

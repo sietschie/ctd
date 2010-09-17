@@ -1,3 +1,4 @@
+ # -*- coding: utf-8 -*-
 """This Module glues together the logic and the system modules."""
 
 from xml.dom import minidom
@@ -60,7 +61,7 @@ class WidgetController:
         evm.RegisterListener(self)
         
         self.system = system
-        (max_x, max_y) = system.scrn.getmaxyx()
+        #(max_x, max_y) = system.scrn.getmaxyx()
 
     def Notify(self, event):
         pass
@@ -267,7 +268,7 @@ class Middle:
         parser.add_option('-d', '--dump', 
                             dest='outfile',
                             help='writes the user input into a file')
-        (options, args) = parser.parse_args()
+        (options, arg) = parser.parse_args()
         
         self.evm = EventManager()
         

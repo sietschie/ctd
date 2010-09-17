@@ -21,7 +21,7 @@ class TestWaypoints(unittest.TestCase):
             distance = 4 + 4 * math.sqrt(2)
             
             m = Minion(wp,10)
-            #TODO: minion speed auf 1 setzen
+            m.speed  = 1
             for step in range(0,steps) :
                 old = m.pos
                 m.animate(distance / steps)

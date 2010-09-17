@@ -6,7 +6,7 @@ class EventManager:
     between the Model, View, and Controller."""
     def __init__(self ):
         self.listeners = WeakKeyDictionary()
-        self.eventQueue= []
+        self.eventQueue = []
 
     #----------------------------------------------------------------------
     def RegisterListener( self, listener ):

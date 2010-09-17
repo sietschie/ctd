@@ -9,7 +9,7 @@ class Vector:
     def __add__(self, val):
         return Vector( self[0] + val[0], self[1] + val[1] )
     
-    def __sub__(self,val):
+    def __sub__(self, val):
         return Vector( self[0] - val[0], self[1] - val[1] )
     
     def __iadd__(self, val):

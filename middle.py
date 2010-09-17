@@ -22,7 +22,7 @@ class Widget:
         self.invert = False  
         self.label = ''
         self.children = []
-        self.offset = (0,0)
+        self.offset = (0, 0)
         self.border = True
         
     def add_child(self, child):
@@ -38,8 +38,8 @@ class Widget:
 class WaveWidget(Widget):
     def __init__(self, x, y, width, height):
         Widget.__init__(self, x, y, width, height)
-        self.time = Widget(1,1,width-2, 1)
-        self.nr_minions = Widget(1,2,width-2, 1)
+        self.time = Widget(1, 1, width-2, 1)
+        self.nr_minions = Widget(1, 2, width-2, 1)
         self.add_child(self.time)
         self.add_child(self.nr_minions)
         self.time.border = False
@@ -251,7 +251,7 @@ class Middle:
                 window.border_bold = False
                 window.show_time(False)
 
-            for i in range(min(len(self.wave_windows), len(wavelist)),len(self.wave_windows)):
+            for i in range(min(len(self.wave_windows), len(wavelist)), len(self.wave_windows)):
                 self.wave_windows[i].show = False
                 
             if self.logic.current_level.next_wave and len(self.logic.current_level.active_waves) < len(self.wave_windows):
@@ -291,39 +291,39 @@ class Middle:
         ## create windows
         #########################################
         
-        self.main_window = Widget(0,0,110,27)
-        self.window = Widget(84,1,25,25)
+        self.main_window = Widget(0, 0, 110, 27)
+        self.window = Widget(84, 1, 25, 25)
 
         self.windows = {}
 
-        self.windows['lives'] = Widget(1,1,23,3)
-        self.windows['money'] = Widget(1,4,23,3)
-        self.windows['points'] = Widget(1,7,23,3)
+        self.windows['lives'] = Widget(1, 1, 23, 3)
+        self.windows['money'] = Widget(1, 4, 23, 3)
+        self.windows['points'] = Widget(1, 7, 23, 3)
 
         for w in self.windows.values():
             self.window.add_child(w)
             
         self.main_window.add_child(self.window)
 
-        self.wave_window = Widget(58,1,25,25)
+        self.wave_window = Widget(58, 1, 25, 25)
         self.main_window.add_child(self.wave_window)
         
-        wave_label = Widget(1,1,23,1)
+        wave_label = Widget(1, 1, 23, 1)
         wave_label.label = 'Waves'
         wave_label.border = False
         self.wave_window.add_child(wave_label)
 
         self.wave_windows = []
-        for i in range(0,4):
-            w = WaveWidget(1,2 + i * 5, 23, 5)
+        for i in range(0, 4):
+            w = WaveWidget(1, 2 + i * 5, 23, 5)
             self.wave_windows.append(w)
             self.wave_window.add_child(w)
             
-        self.wc = WidgetController(self.evm,self.system)
+        self.wc = WidgetController(self.evm, self.system)
         
-        help_window = Widget(1,22,56,4)
+        help_window = Widget(1, 22, 56, 4)
 
-        help_window1 = Widget(0,1,56,1)
+        help_window1 = Widget(0, 1, 56, 1)
         help_window1.label = "Press space to send next wave. Hit q to quit the game."
         help_window1.border = False
         help_window.add_child(help_window1)

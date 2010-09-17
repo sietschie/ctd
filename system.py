@@ -33,7 +33,7 @@ class System:
                 x = ret[1]
                 y = ret[2]
                 button = ret[4]
-                self.evm.Post(MouseClickEvent(button, Vector(x,y)))
+                self.evm.Post(MouseClickEvent(button, Vector(x, y)))
             else:
                 char = chr(char)
                 self.evm.Post(KeyPressEvent(char))

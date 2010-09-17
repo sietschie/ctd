@@ -153,10 +153,10 @@ class Minion(MovingObject):
     waypoints = None
     dwp = 5
     wtg = 0
-    cwp = Vector(0,0)
+    cwp = Vector(0, 0)
 
     def __init__(self, waypoints, hitpoints):
-        MovingObject.__init__(self,waypoints[0])
+        MovingObject.__init__(self, waypoints[0])
         self.waypoints = waypoints
         self.hitpoints = hitpoints
         self.current_wp = 1

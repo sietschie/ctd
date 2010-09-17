@@ -318,6 +318,11 @@ class Middle:
             self.wave_window.add_child(w)
             
         self.wc = WidgetController(self.evm,self.system)
+        
+        help_window = Widget(1,23,56,3)
+        help_window.label = "Press space to send next wave. Hit q to quit the game."
+        
+        self.main_window.add_child(help_window)
 
     def run(self):
         """The main game loop"""

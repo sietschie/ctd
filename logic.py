@@ -1,7 +1,7 @@
 """Handles the general game logic"""
 import math
 from vector import Vector
-from events import TickEvent
+from events import TickEvent, WaveChangeEvent, QuitEvent
 
 class Level:
     """Contains the description of a level"""
@@ -12,13 +12,15 @@ class Level:
     waves = []
     next_wave = None
     active_waves = []
+    
     def __init__(self):
-        pass
+        self.sent_next_wave = False
         
     def send_next_wave(self):
         """Makes the next wave active"""
         if self.next_wave:
             self.active_waves.append(self.next_wave)
+            self.sent_next_wave = True
             if self.waves:
                 self.next_wave = self.waves[0]
                 self.waves.remove(self.next_wave)
@@ -313,13 +315,22 @@ class Logic:
                 self.bullets.append(bullet)
         
         self.current_level.update(delta)
+        
+        if self.current_level.sent_next_wave:
+            self.current_level.sent_next_wave = False
+            self.evm.Post(WaveChangeEvent())
+        
         for wave in self.current_level.active_waves[:]:
             if wave.new_minion:
                 wave.new_minion = False
                 wave.nr_minion -= 1
                 self.add_minion(wave.hp_minion)
+                self.evm.Post(WaveChangeEvent())
                 if wave.nr_minion == 0:
                     self.current_level.active_waves.remove(wave)
         
-
-
+        if self.lives <= 0:
+            self.evm.Post(QuitEvent())
+                    
+        if not self.minions and not self.current_level.active_waves and not self.current_level.next_wave:
+            self.evm.Post(QuitEvent())

@@ -38,13 +38,13 @@
     </waypoints>
     <waves>
         <wave>
-            <offset_wave>1</offset_wave>
-            <offset_minion>500</offset_minion>
+            <offset_wave>5</offset_wave>
+            <offset_minion>5</offset_minion>
             <nr_minion>4</nr_minion>
             <hp_minion>2</hp_minion>
         </wave>
         <wave>
-            <offset_wave>300</offset_wave>
+            <offset_wave>25</offset_wave>
             <offset_minion>4</offset_minion>
             <nr_minion>8</nr_minion>
             <hp_minion>3</hp_minion>

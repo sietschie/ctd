@@ -31,3 +31,5 @@ refactoring
 - mvc-division
   - refactor level
 - use ncurses wrapper method
+- get a good pylint score
+- blinking wave window if wave is currently sending

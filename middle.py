@@ -284,7 +284,7 @@ class Middle:
         if options.outfile:
             self.input_recorder = InputRecorder(self.evm, options.outfile)
         
-        self.load_map('map.xml')
+        self.load_map('map2.xml')
         
         #########################################
         ## create windows

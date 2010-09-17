@@ -1,7 +1,7 @@
 """Handles the general game logic"""
 import math
 from vector import Vector
-from events import TickEvent, WaveChangeEvent
+from events import TickEvent, WaveChangeEvent, QuitEvent
 
 class Level:
     """Contains the description of a level"""
@@ -328,4 +328,9 @@ class Logic:
                 self.evm.Post(WaveChangeEvent())
                 if wave.nr_minion == 0:
                     self.current_level.active_waves.remove(wave)
+        
+        if self.lives <= 0:
+            self.evm.Post(QuitEvent())
                     
+        if not self.minions and not self.current_level.active_waves and not self.current_level.next_wave:
+            self.evm.Post(QuitEvent())

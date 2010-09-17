@@ -1,10 +1,11 @@
 """This Module glues together the logic and the system modules."""
+
 from xml.dom import minidom
 from system import System
 from logic import Logic, Level, Wave
 from vector import Vector
 from eventmanager import EventManager
-from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent, QuitEvent, TickEvent
+from events import KeyPressEvent, MouseClickEvent, ClearScreenEvent, QuitEvent, TickEvent, WaveChangeEvent
 from tickemitter import TickEmitter
 from inputrecorder import InputRecorder, InputPlayer
 
@@ -15,10 +16,13 @@ class Widget:
         self.width = width
         self.height = height      
         self.border = True
+        self.border_bold = False
+        self.show = True
         self.invert = False  
-        self.label = "Hello World"
+        self.label = ''
         self.children = []
         self.offset = (0,0)
+        self.border = True
         
     def add_child(self, child):
         self.children.append(child)
@@ -29,7 +33,27 @@ class Widget:
         child_offset = (offset[0] + self.x, offset[1] + self.y )
         for w in self.children:
             w.set_offset(child_offset)
-                        
+            
+class WaveWidget(Widget):
+    def __init__(self, x, y, width, height):
+        Widget.__init__(self, x, y, width, height)
+        self.time = Widget(1,1,width-2, 1)
+        self.nr_minions = Widget(1,2,width-2, 1)
+        self.add_child(self.time)
+        self.add_child(self.nr_minions)
+        self.time.border = False
+        self.nr_minions.border = False
+        
+    def show_time(self, show):
+        self.time.show = show
+        
+    def set_time(self, time):
+        self.time.label = "%0.1f" % time
+
+    def set_nr(self, nr):
+        self.nr_minions.label = str(nr)
+
+
 class WidgetController:
     def __init__(self, evm, system):
         self.evm = evm
@@ -46,13 +70,15 @@ class WidgetController:
         
         while stack:
             w = stack.pop()
-            stack.extend(w.children)
-            self.draw_widget(w)
+            if w.show:
+                stack.extend(w.children)
+                self.draw_widget(w)
         #current_position = (0,0)
         
         
     def draw_widget(self, widget):
-        self.draw_border(widget)
+        if widget.border:
+            self.draw_border(widget)
         self.draw_label(widget)
         
     def draw_label(self, widget):   
@@ -74,12 +100,20 @@ class WidgetController:
         x = widget.x + widget.offset[0]
         y = widget.y + widget.offset[1]
         
-        border_line = '+'+((width - 2)*'-')+'+'
-        self.system.draw_string_at(x, y, border_line)
-        self.system.draw_string_at(x, y + height - 1, border_line)
-        for i in range(1, height-1):
-            self.system.draw_string_at(x, y + i, '|')
-            self.system.draw_string_at(width + x - 1, y + i, '|')
+        if widget.border_bold:
+            border_line = '█'+((width - 2)*'█')+'█'
+            self.system.draw_string_at(x, y, border_line)
+            self.system.draw_string_at(x, y + height - 1, border_line)
+            for i in range(1, height-1):
+                self.system.draw_string_at(x, y + i, '█')
+                self.system.draw_string_at(width + x - 1, y + i, '█')
+        else:
+            border_line = '+'+((width - 2)*'-')+'+'
+            self.system.draw_string_at(x, y, border_line)
+            self.system.draw_string_at(x, y + height - 1, border_line)
+            for i in range(1, height-1):
+                self.system.draw_string_at(x, y + i, '|')
+                self.system.draw_string_at(width + x - 1, y + i, '|')
         
 # global variables
 class Middle:
@@ -129,34 +163,9 @@ class Middle:
                         
     def draw_hud(self):
         """draws hud to screen"""
-        self.system.draw_string_at(25, 5, "lives:  %03d" % self.logic.lives )
-        self.system.draw_string_at(25, 6, "points: %03d" % self.logic.points )
-        self.system.draw_string_at(25, 7, "money:  %03d" % self.logic.money )
-        self.system.draw_string_at(25, 8, "num minions:  %03d" % len(self.logic.minions) )
-
-        y = 0
-        for minion in self.logic.minions:
-            self.system.draw_string_at(25, 9 + y, \
-                "minion[" + str(y) + "]:  %s" % str(minion) )
-            y += 1
-
-        x = 1
-        for w in self.logic.current_level.active_waves:
-            self.system.draw_string_at(x, 22, \
-                "a: %0.1f, %i" % (w.next_minion_in, w.nr_minion))
-            x += 15
-        
-        w = self.logic.current_level.next_wave
-        if w:
-            self.system.draw_string_at(x, 22, \
-                "n: %0.1f, %0.1f, %i" % (w.offset_wave, w.next_minion_in, w.nr_minion))
-            x += 20
-
-        for w in self.logic.current_level.waves:
-            self.system.draw_string_at(x, 22, \
-                "r: %0.1f, %i" % (w.next_minion_in, w.nr_minion))
-            x += 15
-
+        self.windows['lives'].label = "lives:  %03d" % self.logic.lives
+        self.windows['points'].label = "points: %03d" % self.logic.points
+        self.windows['money'].label = "money:  %03d" % self.logic.money
 
     def load_map(self, file_name):
         """Loads map from xml file"""
@@ -219,7 +228,32 @@ class Middle:
             self.draw_bullets()
             self.draw_hud()
             
-            self.wc.draw_widgets(self.window)
+            self.wc.draw_widgets(self.main_window)
+
+            if self.logic.current_level.next_wave and len(self.logic.current_level.active_waves) < len(self.wave_windows):
+                self.wave_windows[len(self.logic.current_level.active_waves)].set_time(self.logic.current_level.next_wave.offset_wave)
+
+
+        elif isinstance( event, WaveChangeEvent ):
+            wavelist = []
+            wavelist.extend(self.logic.current_level.active_waves)
+            if self.logic.current_level.next_wave:
+                wavelist.append(self.logic.current_level.next_wave)
+            wavelist.extend(self.logic.current_level.waves)
+            
+            for i in range(0, min(len(self.wave_windows), len(wavelist))):
+                wave = wavelist[i]
+                window = self.wave_windows[i]
+                window.set_nr(wave.nr_minion)
+                window.border_bold = False
+                window.show_time(False)
+
+            for i in range(min(len(self.wave_windows), len(wavelist)),len(self.wave_windows)):
+                self.wave_windows[i].show = False
+                
+            if self.logic.current_level.next_wave and len(self.logic.current_level.active_waves) < len(self.wave_windows):
+                self.wave_windows[len(self.logic.current_level.active_waves)].border_bold = True
+                self.wave_windows[len(self.logic.current_level.active_waves)].show_time(True)
 
     def __init__(self):
 
@@ -250,15 +284,37 @@ class Middle:
         
         self.load_map('map.xml')
         
-        self.window = Widget(80,5,25,25)
-        self.window.label = 'Hello Wor'
+        #########################################
+        ## create windows
+        #########################################
+        
+        self.main_window = Widget(0,0,110,27)
+        self.window = Widget(84,1,25,25)
 
-        window2 = Widget(1,1,10,10)
-        window3 = Widget(3,12,10,10)
+        self.windows = {}
 
-        self.window.add_child(window2)
-        self.window.add_child(window3)
+        self.windows['lives'] = Widget(1,1,23,3)
+        self.windows['money'] = Widget(1,4,23,3)
+        self.windows['points'] = Widget(1,7,23,3)
 
+        for w in self.windows.values():
+            self.window.add_child(w)
+            
+        self.main_window.add_child(self.window)
+
+        self.wave_window = Widget(58,1,25,25)
+        self.main_window.add_child(self.wave_window)
+        
+        wave_label = Widget(1,1,23,3)
+        wave_label.label = 'Waves'
+        self.wave_window.add_child(wave_label)
+
+        self.wave_windows = []
+        for i in range(0,4):
+            w = WaveWidget(1,4 + i * 5, 23, 5)
+            self.wave_windows.append(w)
+            self.wave_window.add_child(w)
+            
         self.wc = WidgetController(self.evm,self.system)
 
     def run(self):

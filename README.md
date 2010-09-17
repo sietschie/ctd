@@ -7,6 +7,9 @@ Playing the game
 Press space to send next wave. Hit q to quit the game. 
 Click anywhere on the map to place a tower.
 
+The minions are represented by 'o's. The towers are poubnd signs. 
+And the asteriks are bullets.
+
 If there are no more minions or you lost all your lives the game 
 quits.
 

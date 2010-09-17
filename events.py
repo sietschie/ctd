@@ -31,3 +31,7 @@ class TickEvent(Event):
 class QuitEvent(Event):
     def __init__(self):
         self.name = "Program Quit Event"
+
+class WaveChangeEvent(Event):
+    def __init__(self):
+        self.name = "Wave Change Event"

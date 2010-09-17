@@ -307,17 +307,32 @@ class Middle:
         self.wave_window = Widget(58,1,25,25)
         self.main_window.add_child(self.wave_window)
         
-        wave_label = Widget(1,1,23,3)
+        wave_label = Widget(1,1,23,1)
         wave_label.label = 'Waves'
+        wave_label.border = False
         self.wave_window.add_child(wave_label)
 
         self.wave_windows = []
         for i in range(0,4):
-            w = WaveWidget(1,4 + i * 5, 23, 5)
+            w = WaveWidget(1,2 + i * 5, 23, 5)
             self.wave_windows.append(w)
             self.wave_window.add_child(w)
             
         self.wc = WidgetController(self.evm,self.system)
+        
+        help_window = Widget(1,22,56,4)
+
+        help_window1 = Widget(0,1,56,1)
+        help_window1.label = "Press space to send next wave. Hit q to quit the game."
+        help_window1.border = False
+        help_window.add_child(help_window1)
+
+        help_window2 = Widget(0,2,56,1)
+        help_window2.label = "Click anywhere on the map to place a tower."
+        help_window2.border = False
+        help_window.add_child(help_window2)
+        
+        self.main_window.add_child(help_window)
 
     def run(self):
         """The main game loop"""

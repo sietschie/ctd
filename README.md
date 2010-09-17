@@ -1,6 +1,7 @@
 Commandline Tower Defence
 =========================
-A simple Tower Defence game using ncurses.
+A simple Tower Defence game using ncurses. 
+At the moment there is only one level, one kind of minion and one kind of tower.
 
 Playing the game
 ----------------

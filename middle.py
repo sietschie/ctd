@@ -319,8 +319,17 @@ class Middle:
             
         self.wc = WidgetController(self.evm,self.system)
         
-        help_window = Widget(1,23,56,3)
-        help_window.label = "Press space to send next wave. Hit q to quit the game."
+        help_window = Widget(1,22,56,4)
+
+        help_window1 = Widget(0,1,56,1)
+        help_window1.label = "Press space to send next wave. Hit q to quit the game."
+        help_window1.border = False
+        help_window.add_child(help_window1)
+
+        help_window2 = Widget(0,2,56,1)
+        help_window2.label = "Click anywhere on the map to place a tower."
+        help_window2.border = False
+        help_window.add_child(help_window2)
         
         self.main_window.add_child(help_window)
 

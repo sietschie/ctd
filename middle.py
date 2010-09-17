@@ -154,8 +154,8 @@ class Middle:
 
     def draw_map(self):
         """Draws map to screen."""
-        for x in range(1, 21):
-            for y in range(1, 21):
+        for x in range(1, self.logic.current_level.max_x + 1):
+            for y in range(1, self.logic.current_level.max_y + 1):
                 if self.logic.current_level.tiles[x, y] == 0:
                     self.system.draw_at(Vector(x, y), ' ', 
                         self.system.COLOR_GREEN, self.system.COLOR_GREEN)
@@ -284,7 +284,7 @@ class Middle:
         if options.outfile:
             self.input_recorder = InputRecorder(self.evm, options.outfile)
         
-        self.load_map('map.xml')
+        self.load_map('map2.xml')
         
         #########################################
         ## create windows

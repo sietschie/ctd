@@ -307,13 +307,14 @@ class Middle:
         self.wave_window = Widget(58,1,25,25)
         self.main_window.add_child(self.wave_window)
         
-        wave_label = Widget(1,1,23,3)
+        wave_label = Widget(1,1,23,1)
         wave_label.label = 'Waves'
+        wave_label.border = False
         self.wave_window.add_child(wave_label)
 
         self.wave_windows = []
         for i in range(0,4):
-            w = WaveWidget(1,4 + i * 5, 23, 5)
+            w = WaveWidget(1,2 + i * 5, 23, 5)
             self.wave_windows.append(w)
             self.wave_window.add_child(w)
             

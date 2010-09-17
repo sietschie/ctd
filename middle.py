@@ -328,7 +328,7 @@ class Middle:
         help_window1.border = False
         help_window.add_child(help_window1)
 
-        help_window2 = Widget(0,2,56,1)
+        help_window2 = Widget(0, 2, 56, 1)
         help_window2.label = "Click anywhere on the map to place a tower."
         help_window2.border = False
         help_window.add_child(help_window2)

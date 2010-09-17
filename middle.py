@@ -48,10 +48,10 @@ class WaveWidget(Widget):
         self.time.show = show
         
     def set_time(self, time):
-        self.time.label = "%0.1f" % time
+        self.time.label = "time left: %0.1f" % time
 
     def set_nr(self, nr):
-        self.nr_minions.label = str(nr)
+        self.nr_minions.label = "nr of minions: %i" % nr
 
 
 class WidgetController:

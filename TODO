@@ -11,6 +11,8 @@ game concepts
 - end game, when no minions left
 - show hotkeys somewhere on screen
 - add text to the readme
+- add buttons
+- bug: multiple towers on same spot
 
 refactoring
 - framecounter
@@ -33,3 +35,4 @@ refactoring
 - use ncurses wrapper method
 - get a good pylint score
 - blinking wave window if wave is currently sending
+- make programme cope with window resizing

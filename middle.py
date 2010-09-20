@@ -134,8 +134,7 @@ class Middle:
     def draw_minions(self):
         """Draws minions to screen."""
         for minion in self.logic.minions:
-            #self.system.draw_at(minion.pos.to_int(), 'o', 
-            self.system.draw_at(minion.pos.to_int(), str(minion.points), 
+            self.system.draw_at(minion.pos.to_int(), 'o', 
                 self.system.COLOR_BLACK, self.system.COLOR_YELLOW)
 
     def draw_bullets(self):

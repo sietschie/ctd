@@ -46,6 +46,8 @@ class Wave:
         self.offset_minion = 0
         self.nr_minion = 0
         self.hp_minion = 0
+        self.points_per_minion = 1
+        self.money_per_minion = 1
         
     def update(self, delta):
         """updates the status"""
@@ -150,6 +152,8 @@ class Minion(MovingObject):
     speed = 1
     current_wp = 1
     hitpoints = 0
+    money = 1
+    points = 1
     waypoints = None
     dwp = 5
     wtg = 0
@@ -248,9 +252,12 @@ class Logic:
                             tower = Tower(Vector(x, y))
                             self.towers.append(tower)
 
-    def add_minion(self, hitpoints=1):
+    def add_minion(self, hitpoints=1, points=1, money=1):
         """Adds minion on beginning of the pathway."""
-        self.minions.append(Minion(self.current_level.waypoints, hitpoints))
+        minion = Minion(self.current_level.waypoints, hitpoints)
+        minion.money = money
+        minion.points = points
+        self.minions.append(minion)
 
     def check_for_finished_minions(self):
         """Check if minion reached end of pathway."""
@@ -287,9 +294,9 @@ class Logic:
 
         for minion in self.minions[:]:
             if minion.hitpoints <= 0:
+                self.points += minion.points
+                self.money += minion.money
                 self.minions.remove(minion)
-                self.points += 1
-                self.money += 1
                 
     def Notify(self, event):
         if isinstance( event, TickEvent ):
@@ -323,7 +330,7 @@ class Logic:
             if wave.new_minion:
                 wave.new_minion = False
                 wave.nr_minion -= 1
-                self.add_minion(wave.hp_minion)
+                self.add_minion(wave.hp_minion, wave.points_per_minion, wave.money_per_minion)
                 self.evm.Post(WaveChangeEvent())
                 if wave.nr_minion == 0:
                     self.current_level.active_waves.remove(wave)

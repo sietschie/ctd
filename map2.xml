@@ -42,18 +42,24 @@
             <offset_minion>5</offset_minion>
             <nr_minion>4</nr_minion>
             <hp_minion>2</hp_minion>
+            <points_minion>2</points_minion>
+            <money_minion>1</money_minion>
         </wave>
         <wave>
             <offset_wave>25</offset_wave>
             <offset_minion>4</offset_minion>
             <nr_minion>8</nr_minion>
             <hp_minion>3</hp_minion>
+            <points_minion>4</points_minion>
+            <money_minion>2</money_minion>
         </wave>
         <wave>
             <offset_wave>30</offset_wave>
             <offset_minion>3</offset_minion>
             <nr_minion>12</nr_minion>
             <hp_minion>4</hp_minion>
+            <points_minion>4</points_minion>
+            <money_minion>3</money_minion>
         </wave>
     </waves>
 </level>

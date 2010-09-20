@@ -134,7 +134,8 @@ class Middle:
     def draw_minions(self):
         """Draws minions to screen."""
         for minion in self.logic.minions:
-            self.system.draw_at(minion.pos.to_int(), 'o', 
+            #self.system.draw_at(minion.pos.to_int(), 'o', 
+            self.system.draw_at(minion.pos.to_int(), str(minion.points), 
                 self.system.COLOR_BLACK, self.system.COLOR_YELLOW)
 
     def draw_bullets(self):
@@ -204,6 +205,8 @@ class Middle:
             w.offset_minion = int( get_data(wave, 'offset_minion'))
             w.hp_minion = int( get_data(wave, 'hp_minion'))
             w.nr_minion = int( get_data(wave, 'nr_minion'))
+            w.points_per_minion = int( get_data(wave, 'points_minion'))
+            w.money_per_minion = int( get_data(wave, 'money_minion'))
 
             level.waves.append(w)
             
